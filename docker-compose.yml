@@ -1,0 +1,16 @@
+services:
+  db:
+    image: pgvector/pgvector:0.8.0-pg17
+    environment:
+      POSTGRES_USER: hpo
+      POSTGRES_PASSWORD: hpo
+      POSTGRES_DB: hpo
+    ports: ["5433:5432"] # 5432 thường đã bị Postgres khác chiếm
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "hpo"]
+      interval: 2s
+      retries: 15
+
+volumes:
+  pgdata:
