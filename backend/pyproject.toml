@@ -9,6 +9,7 @@ dependencies = [
     "deepagents",
     "langchain-openai",
     "openpyxl>=3.1.5",
+    "langfuse>=5.2",
 ]
 
 [dependency-groups]
