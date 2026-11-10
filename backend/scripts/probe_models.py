@@ -1,18 +1,21 @@
-"""Phase 0: can qwen-35b + bge-m3 on the DBIZ gateway carry this project?
+"""Phase 0: can the chat models + bge-m3 on the DBIZ gateway carry this project?
 
 Gates (exit 1 if any fails):
   * structured output: week-3 example -> 4 mentions, spans verbatim, assertion/assessment as expected
   * tool calling through Deep Agents: direct tool call, and delegation via `task` to a subagent
   * bge-m3: 1024 dims; Vietnamese term closer to its English HPO label than to an unrelated one
-Each LLM gate runs with thinking off and on; latency is printed, not gated.
+Each LLM gate runs per model, with thinking off and on; latency is printed, not gated.
 
-Run: make probe
+Run: make probe                       # every model in llm_models.toml
+     python scripts/probe_models.py qwen-35b
 """
 
 import math
 import os
 import sys
 import time
+import tomllib
+from pathlib import Path
 from typing import Literal
 
 from deepagents import create_deep_agent
@@ -23,7 +26,8 @@ from openai import OpenAI
 from pydantic import BaseModel, Field
 
 BASE_URL, API_KEY = os.environ["LLM_BASE_URL"], os.environ["LLM_API_KEY"]
-LLM_MODEL, EMBEDDING_MODEL = os.environ["LLM_MODEL"], os.environ["EMBEDDING_MODEL"]
+EMBEDDING_MODEL = os.environ["EMBEDDING_MODEL"]
+MODEL_PARAMS = tomllib.loads((Path(__file__).parents[1] / "llm_models.toml").read_text())
 
 REPORT = (
     "Thai 22 tuần. Nghi thiểu sản xương mũi. Ghi nhận thông liên thất. "
@@ -55,26 +59,27 @@ assessment: ASSESSED = đã khảo sát; LIMITED = khảo sát bị hạn chế;
 Chỉ trích những gì báo cáo nói, không suy diễn."""
 
 results: list[tuple[str, bool, str]] = []
+label = ""  # prefixes check names with the model/mode under test
 
 
 def check(name: str, ok: bool, detail: str = "") -> None:
-    results.append((name, ok, detail))
+    results.append((label + name, ok, detail))
     print(f"  [{'PASS' if ok else 'FAIL'}] {name}  {detail}")
 
 
-def chat(thinking: bool) -> ChatOpenAI:
+def chat(model: str, thinking: bool) -> ChatOpenAI:
     return ChatOpenAI(
         base_url=BASE_URL,
         api_key=API_KEY,
-        model=LLM_MODEL,
+        model=model,
         temperature=0,
         timeout=120,
-        extra_body={"chat_template_kwargs": {"enable_thinking": thinking}},
+        extra_body=MODEL_PARAMS[model]["thinking_on" if thinking else "thinking_off"],
     )
 
 
-def probe_structured(thinking: bool, method: str) -> None:
-    llm = chat(thinking).with_structured_output(Extraction, method=method)
+def probe_structured(model: str, thinking: bool, method: str) -> None:
+    llm = chat(model, thinking).with_structured_output(Extraction, method=method)
     t0 = time.perf_counter()
     try:
         out: Extraction | None = llm.invoke([("system", EXTRACT_PROMPT), ("human", REPORT)])
@@ -105,11 +110,11 @@ def tool_names(messages) -> list[str]:
     return [m.name for m in messages if isinstance(m, ToolMessage)]
 
 
-def probe_agent(thinking: bool) -> None:
+def probe_agent(model: str, thinking: bool) -> None:
     question = [{"role": "user", "content": "Mã HPO của 'thông liên thất' là gì?"}]
 
     agent = create_deep_agent(
-        model=chat(thinking),
+        model=chat(model, thinking),
         tools=[search_hpo],
         system_prompt="Luôn dùng tool search_hpo, rồi trả lời bằng đúng một mã HPO.",
     )
@@ -121,7 +126,7 @@ def probe_agent(thinking: bool) -> None:
     check("  answer has HP:0001629", "HP:0001629" in answer, answer[:120].replace("\n", " "))
 
     agent = create_deep_agent(
-        model=chat(thinking),
+        model=chat(model, thinking),
         system_prompt="Không tự tra cứu. Giao việc tra HPO cho subagent hpo-lookup bằng tool task.",
         subagents=[{
             "name": "hpo-lookup",
@@ -167,11 +172,13 @@ def probe_embedding() -> None:
 if __name__ == "__main__":
     print("== embedding")
     probe_embedding()
-    for thinking in (False, True):
-        print(f"== thinking={'on' if thinking else 'off'}")
-        for method in ("json_schema", "function_calling"):
-            probe_structured(thinking, method)
-        probe_agent(thinking)
+    for model in sys.argv[1:] or list(MODEL_PARAMS):
+        for thinking in (False, True):
+            label = f"{model}/thinking={'on' if thinking else 'off'}: "
+            print(f"== {label}")
+            for method in ("json_schema", "function_calling"):
+                probe_structured(model, thinking, method)
+            probe_agent(model, thinking)
     failed = [name for name, ok, _ in results if not ok]
     print(f"\n{len(results) - len(failed)}/{len(results)} passed" + (f"; failed: {failed}" if failed else ""))
     sys.exit(1 if failed else 0)

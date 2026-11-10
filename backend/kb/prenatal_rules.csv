@@ -1,0 +1,17 @@
+kind,hpo_id,label,source,reason
+subtree,HP:0001197,Abnormality of prenatal development or birth,hpo_prenatal_branch,Nhánh tiền sản do chuyên gia tiền sản của HPO xây dựng (Dhombres et al. 2022)
+onset,HP:0030674,Antenatal onset,hpoa_onset,Term có annotation bệnh với onset tiền sản trong phenotype.hpoa
+subtree,HP:0001507,Growth abnormality,g14_assumption,Sinh trắc học thai (FGR/thai to)
+subtree,HP:0001789,Hydrops fetalis,g14_assumption,Phù thai
+subtree,HP:0000234,Abnormality of the head,g14_assumption,Sọ mặt quan sát được qua siêu âm
+subtree,HP:0000464,Abnormality of the neck,g14_assumption,Vùng gáy (NT/NF/nang bạch huyết)
+subtree,HP:0012639,Abnormal nervous system morphology,g14_assumption,Hình thái thần kinh trung ương
+subtree,HP:0030680,Abnormal cardiovascular system morphology,g14_assumption,Hình thái tim mạch
+subtree,HP:0002088,Abnormal lung morphology,g14_assumption,Hình thái phổi
+subtree,HP:0002103,Abnormal pleura morphology,g14_assumption,Tràn dịch màng phổi
+subtree,HP:0001438,Abnormal abdomen morphology,g14_assumption,Thành bụng (thoát vị rốn/khe hở thành bụng)
+subtree,HP:0012718,Abnormal gastrointestinal tract morphology,g14_assumption,Hình thái ống tiêu hoá
+subtree,HP:0000079,Abnormality of the urinary system,g14_assumption,Thận và đường niệu
+subtree,HP:0000078,Abnormality of the genital system,g14_assumption,Cơ quan sinh dục
+subtree,HP:0011842,Abnormal skeletal morphology,g14_assumption,Hình thái xương
+subtree,HP:0040064,Abnormality of limbs,g14_assumption,Chi
