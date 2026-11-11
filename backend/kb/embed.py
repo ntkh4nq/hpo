@@ -9,18 +9,11 @@ Resumable: every batch commits, so re-running continues where it stopped. Identi
 import os
 from concurrent.futures import ThreadPoolExecutor
 
-from openai import OpenAI
-
 from kb.db import connect
+from kb.embedding import embed_texts
 
 BATCH = 64
 WORKERS = 4  # ponytail: fixed small fan-out; tune against the gateway's rate limit if it throttles
-
-
-def embed_texts(texts: list[str], model: str | None = None) -> list[list[float]]:
-    client = OpenAI(base_url=os.environ["LLM_BASE_URL"], api_key=os.environ["LLM_API_KEY"])
-    data = client.embeddings.create(model=model or os.environ["EMBEDDING_MODEL"], input=texts).data
-    return [d.embedding for d in data]
 
 
 def embed_names() -> None:
