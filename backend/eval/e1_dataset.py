@@ -7,6 +7,10 @@ Labels are SILVER: ChatGPT-assigned, not expert-reviewed. Queries are the raw ph
 
 Idempotent: item ids derive from the phrase; items no longer produced are archived.
 
+Dev/test split (docs/eval-strategy.md §4): items sharing a gold code form one group (connected components),
+so every wording of a concept lands on the same side. Groups are keyed by their smallest gold code, sorted by
+sha1(key), and each goes to the side with fewer items (ties -> dev). Stored as metadata.split / split_version.
+
     python -m eval.e1_dataset
 """
 
@@ -21,6 +25,7 @@ from kb.db import connect
 from kb.seed import norm
 
 DATASET = "e1-phrase-to-hpo"
+SPLIT_VERSION = "v1"  # bump (and add a decisions.md row) whenever assign_splits changes
 
 
 def build_items() -> list[dict]:
@@ -58,11 +63,41 @@ def build_items() -> list[dict]:
     } for key, g in sorted(groups.items())]
 
 
+def assign_splits(items: list[dict]) -> dict[str, str]:
+    """item id -> "dev" | "test", grouping items that share any gold code."""
+    parent: dict[str, str] = {}
+
+    def find(x: str) -> str:
+        while parent.setdefault(x, x) != x:
+            parent[x] = x = parent[parent[x]]
+        return x
+
+    for item in items:
+        first, *rest = item["expected_output"]["hpo_ids"]
+        for code in rest:
+            parent[find(code)] = find(first)
+
+    groups: dict[str, list[dict]] = defaultdict(list)
+    for item in items:
+        groups[find(item["expected_output"]["hpo_ids"][0])].append(item)
+    keyed = {min(c for i in g for c in i["expected_output"]["hpo_ids"]): g for g in groups.values()}
+
+    split, size = {}, {"dev": 0, "test": 0}
+    for key in sorted(keyed, key=lambda k: hashlib.sha1(k.encode()).hexdigest()):
+        side = "dev" if size["dev"] <= size["test"] else "test"
+        size[side] += len(keyed[key])
+        split.update((i["id"], side) for i in keyed[key])
+    return split
+
+
 DATASET_DESCRIPTION = "Vietnamese clinical phrase -> expected HPO term. query_already_indexed = easy item."
 
 
 def main() -> None:
     items = build_items()
+    split = assign_splits(items)
+    for item in items:
+        item["metadata"] |= {"split": split[item["id"]], "split_version": SPLIT_VERSION}
     langfuse = get_client()
     langfuse.create_dataset(name=DATASET, description=DATASET_DESCRIPTION,
                             metadata={})
@@ -76,6 +111,10 @@ def main() -> None:
 
     multi = sum(len(i["expected_output"]["hpo_ids"]) > 1 for i in items)
     print(f"{DATASET}: {len(items)} items ({multi} with >1 gold code), {len(stale)} archived")
+    for side in ("dev", "test"):
+        part = [i for i in items if i["metadata"]["split"] == side]
+        hard = sum(not i["metadata"]["query_already_indexed"] for i in part)
+        print(f"  {side} ({SPLIT_VERSION}): {len(part)} items, {hard} hard")
 
 
 if __name__ == "__main__":

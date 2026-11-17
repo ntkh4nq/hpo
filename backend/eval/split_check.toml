@@ -1,0 +1,6 @@
+# Split check (plan.md phase 3, decisions T31).
+# A model item matches a gold item when the Dice overlap of their word sets is >= match_threshold.
+# 0.5 is a starting guess: "ối" ~ "nước ối" = 0.67, "thận phải ứ nước" ~ "thận trái" = 0.33.
+match_threshold = 0.5
+runs = 1  # 40 DeepSeek requests per run; 3 runs (--runs 3) only when stability is in question (user 2026-11-16: minimise requests)
+concurrency = 4  # parallel model calls per run

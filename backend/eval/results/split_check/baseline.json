@@ -1,0 +1,3509 @@
+{
+ "time": "2026-11-17T00:05:18",
+ "model": "deepseek-v4-flash",
+ "prompt_version": "164e53fc0256",
+ "thinking": true,
+ "git": "1f6f0f6",
+ "config": {
+  "match_threshold": 0.5,
+  "runs": 1,
+  "concurrency": 4
+ },
+ "summary": {
+  "recall": [
+   0.9874213836477987
+  ],
+  "precision": [
+   0.9781931464174455
+  ],
+  "status_accuracy": [
+   0.9904458598726115
+  ],
+  "missed": [
+   4
+  ],
+  "extra": [
+   7
+  ],
+  "wrong_status": [
+   3
+  ],
+  "source_text_found": [
+   1.0
+  ]
+ },
+ "runs": [
+  {
+   "totals": {
+    "recall": 0.9874213836477987,
+    "precision": 0.9781931464174455,
+    "status_accuracy": 0.9904458598726115,
+    "missed": 4,
+    "extra": 7,
+    "wrong_status": 3,
+    "source_text_found": 1.0
+   },
+   "cases": [
+    {
+     "id": "S01",
+     "failed": false,
+     "seconds": 7.3,
+     "pred": [
+      {
+       "phrase": "giãn bể lớn",
+       "source_text": "Kích thước bể lớn 11 mm, giãn bể lớn.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "22 tuần 4 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "không thấy vách trong suốt",
+       "source_text": "Không thấy vách trong suốt.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "22 tuần 4 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "khe hở môi bên trái",
+       "source_text": "Khe hở môi bên trái, chưa thấy rõ khe hở vòm miệng do thai úp mặt.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "22 tuần 4 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "khe hở vòm miệng",
+       "source_text": "Khe hở môi bên trái, chưa thấy rõ khe hở vòm miệng do thai úp mặt.",
+       "assertion": "UNCERTAIN",
+       "assessment": "LIMITED",
+       "temporality": "22 tuần 4 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "hai bàn tay nắm chặt",
+       "source_text": "Hai bàn tay nắm chặt, ngón trỏ chồng lên ngón giữa ở cả hai bên.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "22 tuần 4 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "ngón trỏ chồng lên ngón giữa ở cả hai bên",
+       "source_text": "Hai bàn tay nắm chặt, ngón trỏ chồng lên ngón giữa ở cả hai bên.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "22 tuần 4 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bàn chân phải hình ghế bập bênh",
+       "source_text": "Bàn chân phải hình ghế bập bênh.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "22 tuần 4 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "đa ối",
+       "source_text": "Đa ối, chỉ số ối 26 cm.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "22 tuần 4 ngày",
+       "subject": "FETUS"
+      }
+     ],
+     "matched": 8,
+     "fuzzy": [
+      [
+       "ngón trỏ chồng lên ngón giữa ở cả hai bàn tay",
+       "ngón trỏ chồng lên ngón giữa ở cả hai bên",
+       0.84
+      ]
+     ],
+     "missed": [],
+     "extra": [],
+     "wrong_status": []
+    },
+    {
+     "id": "S02",
+     "failed": false,
+     "seconds": 5.5,
+     "pred": [
+      {
+       "phrase": "thất trái nhỏ",
+       "source_text": "Tim: thất trái nhỏ, thành dày, không thấy dòng chảy qua van hai lá.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "23 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "thành thất trái dày",
+       "source_text": "Tim: thất trái nhỏ, thành dày, không thấy dòng chảy qua van hai lá.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "23 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "không thấy dòng chảy qua van hai lá",
+       "source_text": "Tim: thất trái nhỏ, thành dày, không thấy dòng chảy qua van hai lá.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "23 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "động mạch chủ lên nhỏ",
+       "source_text": "Động mạch chủ lên nhỏ, cung động mạch chủ thiểu sản.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "23 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "cung động mạch chủ thiểu sản",
+       "source_text": "Động mạch chủ lên nhỏ, cung động mạch chủ thiểu sản.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "23 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "tràn dịch màng ngoài tim lượng ít",
+       "source_text": "Tràn dịch màng ngoài tim lượng ít.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "23 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bất thường hình thái não",
+       "source_text": "Chưa khảo sát hình thái não.",
+       "assertion": "UNCERTAIN",
+       "assessment": "NOT_ASSESSED",
+       "temporality": "23 tuần",
+       "subject": "FETUS"
+      }
+     ],
+     "matched": 7,
+     "fuzzy": [
+      [
+       "tràn dịch màng ngoài tim",
+       "tràn dịch màng ngoài tim lượng ít",
+       0.83
+      ],
+      [
+       "hình thái não",
+       "bất thường hình thái não",
+       0.75
+      ]
+     ],
+     "missed": [],
+     "extra": [],
+     "wrong_status": []
+    },
+    {
+     "id": "S03",
+     "failed": false,
+     "seconds": 6.2,
+     "pred": [
+      {
+       "phrase": "bàng quang căng to",
+       "source_text": "Bàng quang: căng to, thành dày, có dấu hiệu lỗ khoá ở cổ bàng quang.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "18 tuần 2 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "thành bàng quang dày",
+       "source_text": "Bàng quang: căng to, thành dày, có dấu hiệu lỗ khoá ở cổ bàng quang.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "18 tuần 2 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "dấu hiệu lỗ khoá ở cổ bàng quang",
+       "source_text": "Bàng quang: căng to, thành dày, có dấu hiệu lỗ khoá ở cổ bàng quang.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "18 tuần 2 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "niệu quản giãn hai bên",
+       "source_text": "Niệu quản: giãn hai bên.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "18 tuần 2 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "hai thận ứ nước",
+       "source_text": "Thận: hai thận ứ nước, nhu mô mỏng, có vài nang nhỏ vùng vỏ thận phải.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "18 tuần 2 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "nhu mô thận mỏng",
+       "source_text": "Thận: hai thận ứ nước, nhu mô mỏng, có vài nang nhỏ vùng vỏ thận phải.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "18 tuần 2 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "vài nang nhỏ vùng vỏ thận phải",
+       "source_text": "Thận: hai thận ứ nước, nhu mô mỏng, có vài nang nhỏ vùng vỏ thận phải.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "18 tuần 2 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "vô ối",
+       "source_text": "Ối: vô ối.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "18 tuần 2 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "kích thước lồng ngực",
+       "source_text": "Phổi: không đánh giá được kích thước lồng ngực do vô ối.",
+       "assertion": "UNCERTAIN",
+       "assessment": "NOT_ASSESSABLE",
+       "temporality": "18 tuần 2 ngày",
+       "subject": "FETUS"
+      }
+     ],
+     "matched": 9,
+     "fuzzy": [
+      [
+       "nhu mô hai thận mỏng",
+       "nhu mô thận mỏng",
+       0.89
+      ]
+     ],
+     "missed": [],
+     "extra": [],
+     "wrong_status": []
+    },
+    {
+     "id": "S04",
+     "failed": false,
+     "seconds": 4.8,
+     "pred": [
+      {
+       "phrase": "các xương dài ngắn hơn nhiều so với tuổi thai",
+       "source_text": "Các xương dài ngắn hơn nhiều so với tuổi thai, xương đùi hai bên cong hình ống nghe.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "20 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "xương đùi hai bên cong hình ống nghe",
+       "source_text": "Các xương dài ngắn hơn nhiều so với tuổi thai, xương đùi hai bên cong hình ống nghe.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "20 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "lồng ngực hẹp",
+       "source_text": "Lồng ngực hẹp, xương sườn ngắn.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "20 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "xương sườn ngắn",
+       "source_text": "Lồng ngực hẹp, xương sườn ngắn.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "20 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "hộp sọ hình lá chẻ ba",
+       "source_text": "Hộp sọ hình lá chẻ ba, trán nhô.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "20 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "trán nhô",
+       "source_text": "Hộp sọ hình lá chẻ ba, trán nhô.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "20 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "thân đốt sống dẹt",
+       "source_text": "Thân đốt sống dẹt.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "20 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bàn tay ngắn",
+       "source_text": "Bàn tay ngắn, các ngón tay tách rời nhau hình đinh ba.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "20 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "các ngón tay tách rời nhau hình đinh ba",
+       "source_text": "Bàn tay ngắn, các ngón tay tách rời nhau hình đinh ba.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "20 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "đa ối nhẹ",
+       "source_text": "Nghi đa ối nhẹ.",
+       "assertion": "SUSPECTED",
+       "assessment": "ASSESSED",
+       "temporality": "20 tuần",
+       "subject": "FETUS"
+      }
+     ],
+     "matched": 10,
+     "fuzzy": [],
+     "missed": [],
+     "extra": [],
+     "wrong_status": []
+    },
+    {
+     "id": "S05",
+     "failed": false,
+     "seconds": 5.5,
+     "pred": [
+      {
+       "phrase": "khoảng sáng sau gáy tăng",
+       "source_text": "Khoảng sáng sau gáy tăng.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "12 tuần 5 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "nang bạch huyết vùng cổ có vách",
+       "source_text": "Nang bạch huyết vùng cổ có vách.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "12 tuần 5 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "phù da toàn thân",
+       "source_text": "Phù da toàn thân.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "12 tuần 5 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "ống tĩnh mạch",
+       "source_text": "Không quan sát được ống tĩnh mạch do thai cử động nhiều.",
+       "assertion": "UNCERTAIN",
+       "assessment": "NOT_ASSESSABLE",
+       "temporality": "12 tuần 5 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bất thường dạ dày",
+       "source_text": "Dạ dày, bàng quang: thấy.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "12 tuần 5 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bất thường bàng quang",
+       "source_text": "Dạ dày, bàng quang: thấy.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "12 tuần 5 ngày",
+       "subject": "FETUS"
+      }
+     ],
+     "matched": 6,
+     "fuzzy": [],
+     "missed": [],
+     "extra": [],
+     "wrong_status": []
+    },
+    {
+     "id": "S06",
+     "failed": false,
+     "seconds": 9.7,
+     "pred": [
+      {
+       "phrase": "cân nặng ước lượng dưới bách phân vị 3",
+       "source_text": "Thai 31 tuần, ước lượng cân nặng 1.150 g, dưới bách phân vị 3.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "31 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "chu vi bụng nhỏ so với tuổi thai",
+       "source_text": "Chu vi bụng nhỏ so với tuổi thai.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "31 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "mất dòng cuối tâm trương động mạch rốn",
+       "source_text": "Doppler động mạch rốn: mất dòng cuối tâm trương.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "31 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "nhiều ổ vôi hoá bánh nhau",
+       "source_text": "Bánh nhau mặt sau, dày 52 mm, có nhiều ổ vôi hoá.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "31 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "dây rốn bám mép bánh nhau",
+       "source_text": "Dây rốn bám mép bánh nhau.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "31 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "thiểu ối",
+       "source_text": "Thiểu ối, chỉ số ối 4 cm.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "31 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "tăng huyết áp",
+       "source_text": "Mẹ tăng huyết áp từ tuần 26, đang điều trị.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": null,
+       "subject": "MOTHER"
+      }
+     ],
+     "matched": 7,
+     "fuzzy": [
+      [
+       "bánh nhau có nhiều ổ vôi hoá",
+       "nhiều ổ vôi hoá bánh nhau",
+       0.92
+      ]
+     ],
+     "missed": [
+      {
+       "phrase": "bánh nhau dày",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "subject": "FETUS"
+      }
+     ],
+     "extra": [],
+     "wrong_status": []
+    },
+    {
+     "id": "S07",
+     "failed": false,
+     "seconds": 5.4,
+     "pred": [
+      {
+       "phrase": "không thấy dạ dày ở vị trí bình thường",
+       "source_text": "Không thấy dạ dày ở vị trí bình thường; kiểm tra lại sau 40 phút vẫn không thấy.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "21 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "đa ối",
+       "source_text": "Đa ối, chỉ số ối 27 cm.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "21 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "túi cùng thực quản giãn",
+       "source_text": "Không thấy túi cùng thực quản giãn.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "21 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bất thường bốn buồng tim",
+       "source_text": "Tim: không thấy bất thường bốn buồng và các đường ra.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "21 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bất thường các đường ra tim",
+       "source_text": "Tim: không thấy bất thường bốn buồng và các đường ra.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "21 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "khối ở phổi hai bên",
+       "source_text": "Phổi hai bên không thấy khối.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "21 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "thoát vị hoành",
+       "source_text": "Không có thoát vị hoành.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "21 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "không có xương quay bên phải",
+       "source_text": "Không có xương quay bên phải, bàn tay phải gập vào trong.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "21 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bàn tay phải gập vào trong",
+       "source_text": "Không có xương quay bên phải, bàn tay phải gập vào trong.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "21 tuần",
+       "subject": "FETUS"
+      }
+     ],
+     "matched": 9,
+     "fuzzy": [
+      [
+       "bất thường các đường ra của tim",
+       "bất thường các đường ra tim",
+       0.92
+      ],
+      [
+       "không thấy dạ dày",
+       "không thấy dạ dày ở vị trí bình thường",
+       0.62
+      ]
+     ],
+     "missed": [],
+     "extra": [],
+     "wrong_status": []
+    },
+    {
+     "id": "S08",
+     "failed": false,
+     "seconds": 5.0,
+     "pred": [
+      {
+       "phrase": "khuyết cung sau đoạn thắt lưng – cùng (L4–S1)",
+       "source_text": "Cột sống: khuyết cung sau đoạn thắt lưng – cùng (L4–S1), có túi thoát vị chứa thành phần thần kinh.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "19 tuần 6 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "túi thoát vị chứa thành phần thần kinh",
+       "source_text": "Cột sống: khuyết cung sau đoạn thắt lưng – cùng (L4–S1), có túi thoát vị chứa thành phần thần kinh.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "19 tuần 6 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "dấu hiệu quả chanh",
+       "source_text": "Não: dấu hiệu quả chanh (+), tiểu não hình quả chuối, bể lớn bị xoá.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "19 tuần 6 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "tiểu não hình quả chuối",
+       "source_text": "Não: dấu hiệu quả chanh (+), tiểu não hình quả chuối, bể lớn bị xoá.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "19 tuần 6 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bể lớn bị xoá",
+       "source_text": "Não: dấu hiệu quả chanh (+), tiểu não hình quả chuối, bể lớn bị xoá.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "19 tuần 6 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bàn chân khoèo bên trái",
+       "source_text": "Hai bàn chân khoèo (bên trái rõ hơn (góc lệch khoảng 70°) bên phải).",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "19 tuần 6 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bàn chân khoèo bên phải",
+       "source_text": "Hai bàn chân khoèo (bên trái rõ hơn (góc lệch khoảng 70°) bên phải).",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "19 tuần 6 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "cử động hai chi dưới",
+       "source_text": "Cử động hai chi dưới khó đánh giá do thai nằm sấp.",
+       "assertion": "UNCERTAIN",
+       "assessment": "LIMITED",
+       "temporality": "19 tuần 6 ngày",
+       "subject": "FETUS"
+      }
+     ],
+     "matched": 7,
+     "fuzzy": [
+      [
+       "khuyết cung sau cột sống đoạn thắt lưng – cùng",
+       "khuyết cung sau đoạn thắt lưng – cùng (L4–S1)",
+       0.78
+      ],
+      [
+       "túi thoát vị chứa thành phần thần kinh ở cột sống đoạn thắt lưng – cùng",
+       "túi thoát vị chứa thành phần thần kinh",
+       0.7
+      ],
+      [
+       "hai bàn chân khoèo",
+       "bàn chân khoèo bên phải",
+       0.67
+      ]
+     ],
+     "missed": [],
+     "extra": [
+      {
+       "phrase": "bàn chân khoèo bên trái",
+       "source_text": "Hai bàn chân khoèo (bên trái rõ hơn (góc lệch khoảng 70°) bên phải).",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "19 tuần 6 ngày",
+       "subject": "FETUS"
+      }
+     ],
+     "wrong_status": []
+    },
+    {
+     "id": "S09",
+     "failed": false,
+     "seconds": 5.6,
+     "pred": [
+      {
+       "phrase": "khe hở môi trên hai bên lan vào cung răng",
+       "source_text": "Mặt: môi trên khe hở hai bên, lan vào cung răng; khe hở vòm miệng nghi có; hai mắt gần nhau; mũi hình vòi phía trên hai mắt.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "26 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "khe hở vòm miệng",
+       "source_text": "Mặt: môi trên khe hở hai bên, lan vào cung răng; khe hở vòm miệng nghi có; hai mắt gần nhau; mũi hình vòi phía trên hai mắt.",
+       "assertion": "SUSPECTED",
+       "assessment": "ASSESSED",
+       "temporality": "26 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "hai mắt gần nhau",
+       "source_text": "Mặt: môi trên khe hở hai bên, lan vào cung răng; khe hở vòm miệng nghi có; hai mắt gần nhau; mũi hình vòi phía trên hai mắt.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "26 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "mũi hình vòi phía trên hai mắt",
+       "source_text": "Mặt: môi trên khe hở hai bên, lan vào cung răng; khe hở vòm miệng nghi có; hai mắt gần nhau; mũi hình vòi phía trên hai mắt.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "26 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "não trước không phân chia thể không thuỳ",
+       "source_text": "Não: não trước không phân chia thể không thuỳ, đồi thị dính nhau.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "26 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "đồi thị dính nhau",
+       "source_text": "Não: não trước không phân chia thể không thuỳ, đồi thị dính nhau.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "26 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "tứ chi",
+       "source_text": "Tứ chi chưa khảo sát được do tư thế.",
+       "assertion": "UNCERTAIN",
+       "assessment": "NOT_ASSESSABLE",
+       "temporality": "26 tuần",
+       "subject": "FETUS"
+      }
+     ],
+     "matched": 7,
+     "fuzzy": [],
+     "missed": [],
+     "extra": [],
+     "wrong_status": []
+    },
+    {
+     "id": "S10",
+     "failed": false,
+     "seconds": 3.3,
+     "pred": [
+      {
+       "phrase": "hở thành bụng cạnh phải chỗ cắm dây rốn",
+       "source_text": "Hở thành bụng cạnh phải chỗ cắm dây rốn.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "16 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "các quai ruột ngoài thành bụng thành dày",
+       "source_text": "Các quai ruột ngoài thành bụng thành dày, giãn nhẹ.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "16 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "các quai ruột ngoài thành bụng giãn nhẹ",
+       "source_text": "Các quai ruột ngoài thành bụng thành dày, giãn nhẹ.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "16 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "dạ dày bị kéo lệch về phía lỗ hở",
+       "source_text": "Dạ dày bị kéo lệch về phía lỗ hở.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "16 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bất thường tim bốn buồng",
+       "source_text": "Tim bốn buồng bình thường.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "16 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bất thường ối",
+       "source_text": "Ối bình thường.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "16 tuần",
+       "subject": "FETUS"
+      }
+     ],
+     "matched": 6,
+     "fuzzy": [
+      [
+       "quai ruột ngoài thành bụng giãn nhẹ",
+       "các quai ruột ngoài thành bụng giãn nhẹ",
+       0.93
+      ],
+      [
+       "quai ruột ngoài thành bụng thành dày",
+       "các quai ruột ngoài thành bụng thành dày",
+       0.92
+      ],
+      [
+       "dạ dày bị kéo lệch về phía lỗ hở thành bụng",
+       "dạ dày bị kéo lệch về phía lỗ hở",
+       0.9
+      ]
+     ],
+     "missed": [],
+     "extra": [],
+     "wrong_status": []
+    },
+    {
+     "id": "S11",
+     "failed": false,
+     "seconds": 8.0,
+     "pred": [
+      {
+       "phrase": "khối thoát vị tại chân cuống rốn, có màng bao, chứa gan và ruột",
+       "source_text": "Khối thoát vị tại chân cuống rốn, có màng bao, chứa gan và ruột.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "22 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "lưỡi to",
+       "source_text": "Lưỡi to, thường thè ra khỏi miệng.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "22 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "lưỡi thường thè ra khỏi miệng",
+       "source_text": "Lưỡi to, thường thè ra khỏi miệng.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "22 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "chân phải dài hơn chân trái",
+       "source_text": "Chân phải dài và to hơn chân trái.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "22 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "chân phải to hơn chân trái",
+       "source_text": "Chân phải dài và to hơn chân trái.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "22 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bánh nhau dày",
+       "source_text": "Bánh nhau dày, có nhiều nang nhỏ.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "22 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bánh nhau có nhiều nang nhỏ",
+       "source_text": "Bánh nhau dày, có nhiều nang nhỏ.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "22 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "đa ối",
+       "source_text": "Đa ối.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "22 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "thai lớn so với tuổi",
+       "source_text": "Thai lớn so với tuổi: ước lượng cân nặng trên bách phân vị 97.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "22 tuần",
+       "subject": "FETUS"
+      }
+     ],
+     "matched": 7,
+     "fuzzy": [
+      [
+       "chân phải dài và to hơn chân trái",
+       "chân phải to hơn chân trái",
+       0.83
+      ]
+     ],
+     "missed": [],
+     "extra": [
+      {
+       "phrase": "lưỡi thường thè ra khỏi miệng",
+       "source_text": "Lưỡi to, thường thè ra khỏi miệng.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "22 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "chân phải dài hơn chân trái",
+       "source_text": "Chân phải dài và to hơn chân trái.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "22 tuần",
+       "subject": "FETUS"
+      }
+     ],
+     "wrong_status": []
+    },
+    {
+     "id": "S12",
+     "failed": false,
+     "seconds": 17.8,
+     "pred": [
+      {
+       "phrase": "phù thai",
+       "source_text": "Thai 28 tuần, phù thai.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "28 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "tràn dịch màng phổi hai bên lượng nhiều",
+       "source_text": "Tràn dịch màng phổi hai bên lượng nhiều, phổi bị đẩy xẹp.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "28 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "phổi bị đẩy xẹp",
+       "source_text": "Tràn dịch màng phổi hai bên lượng nhiều, phổi bị đẩy xẹp.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "28 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "cổ trướng lượng vừa",
+       "source_text": "Cổ trướng lượng vừa.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "28 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "phù da đầu",
+       "source_text": "Phù da đầu và da thành bụng, dày 8 mm.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "28 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "phù da thành bụng",
+       "source_text": "Phù da đầu và da thành bụng, dày 8 mm.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "28 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "tràn dịch màng ngoài tim",
+       "source_text": "Không có tràn dịch màng ngoài tim.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "28 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "tim to",
+       "source_text": "Tim to, tỉ lệ diện tích tim/lồng ngực 0,55.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "28 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "đỉnh tâm thu động mạch não giữa tăng",
+       "source_text": "Đỉnh tâm thu động mạch não giữa tăng (1,6 MoM), nghi thiếu máu thai.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "28 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "thiếu máu thai",
+       "source_text": "Đỉnh tâm thu động mạch não giữa tăng (1,6 MoM), nghi thiếu máu thai.",
+       "assertion": "SUSPECTED",
+       "assessment": "ASSESSED",
+       "temporality": "28 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bánh nhau dày",
+       "source_text": "Bánh nhau dày, phù.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "28 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bánh nhau phù",
+       "source_text": "Bánh nhau dày, phù.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "28 tuần",
+       "subject": "FETUS"
+      }
+     ],
+     "matched": 12,
+     "fuzzy": [
+      [
+       "tràn dịch màng phổi hai bên",
+       "tràn dịch màng phổi hai bên lượng nhiều",
+       0.86
+      ],
+      [
+       "cổ trướng",
+       "cổ trướng lượng vừa",
+       0.67
+      ]
+     ],
+     "missed": [],
+     "extra": [],
+     "wrong_status": []
+    },
+    {
+     "id": "S13",
+     "failed": false,
+     "seconds": 187.5,
+     "pred": [
+      {
+       "phrase": "đảo ngược phủ tạng toàn bộ",
+       "source_text": "Siêu âm tim thai 25 tuần: đảo ngược phủ tạng toàn bộ, mỏm tim hướng sang phải.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "25 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "mỏm tim hướng sang phải",
+       "source_text": "Siêu âm tim thai 25 tuần: đảo ngược phủ tạng toàn bộ, mỏm tim hướng sang phải.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "25 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "Kênh nhĩ thất toàn phần",
+       "source_text": "Kênh nhĩ thất toàn phần, van nhĩ thất chung hở vừa.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "25 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "van nhĩ thất chung hở vừa",
+       "source_text": "Kênh nhĩ thất toàn phần, van nhĩ thất chung hở vừa.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "25 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "Thất phải hai đường ra",
+       "source_text": "Thất phải hai đường ra, hẹp động mạch phổi.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "25 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "hẹp động mạch phổi",
+       "source_text": "Thất phải hai đường ra, hẹp động mạch phổi.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "25 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "Tĩnh mạch chủ trên trái tồn tại đổ về xoang vành",
+       "source_text": "Tĩnh mạch chủ trên trái tồn tại đổ về xoang vành.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "25 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "không thấy lách",
+       "source_text": "Không thấy lách.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "25 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bất thường nhịp tim",
+       "source_text": "Nhịp tim đều.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "25 tuần",
+       "subject": "FETUS"
+      }
+     ],
+     "matched": 9,
+     "fuzzy": [],
+     "missed": [],
+     "extra": [],
+     "wrong_status": []
+    },
+    {
+     "id": "S14",
+     "failed": false,
+     "seconds": 8.6,
+     "pred": [
+      {
+       "phrase": "thai vô sọ",
+       "source_text": "Lần mang thai thứ nhất thai vô sọ, đình chỉ lúc 14 tuần.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": null,
+       "subject": "FAMILY"
+      },
+      {
+       "phrase": "bệnh thận đa nang",
+       "source_text": "Anh ruột của chồng bị bệnh thận đa nang.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": null,
+       "subject": "FAMILY"
+      },
+      {
+       "phrase": "đái tháo đường type 1",
+       "source_text": "Mẹ đái tháo đường type 1 từ năm 15 tuổi, HbA1c 8,2%.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": null,
+       "subject": "MOTHER"
+      },
+      {
+       "phrase": "thận phải có nhiều nang kích thước khác nhau không thông nhau",
+       "source_text": "Thai 20 tuần: thận phải có nhiều nang kích thước khác nhau không thông nhau, thận trái không thấy ở hố thận và vùng chậu.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "20 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "không thấy thận trái ở hố thận và vùng chậu",
+       "source_text": "Thai 20 tuần: thận phải có nhiều nang kích thước khác nhau không thông nhau, thận trái không thấy ở hố thận và vùng chậu.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "20 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bàng quang nhỏ",
+       "source_text": "Bàng quang nhỏ.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "20 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "ối giảm",
+       "source_text": "Ối giảm.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "20 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bất sản xương cùng",
+       "source_text": "Đốt sống cùng không thấy rõ, nghi bất sản xương cùng.",
+       "assertion": "SUSPECTED",
+       "assessment": "ASSESSED",
+       "temporality": "20 tuần",
+       "subject": "FETUS"
+      }
+     ],
+     "matched": 8,
+     "fuzzy": [
+      [
+       "vô sọ",
+       "thai vô sọ",
+       0.8
+      ]
+     ],
+     "missed": [],
+     "extra": [],
+     "wrong_status": []
+    },
+    {
+     "id": "S15",
+     "failed": false,
+     "seconds": 8.7,
+     "pred": [
+      {
+       "phrase": "bất thường hộp sọ",
+       "source_text": "Đầu: hộp sọ bình thường, cấu trúc đường giữa bình thường, tiểu não bình thường.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "22 tuần 1 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bất thường cấu trúc đường giữa",
+       "source_text": "Đầu: hộp sọ bình thường, cấu trúc đường giữa bình thường, tiểu não bình thường.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "22 tuần 1 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bất thường tiểu não",
+       "source_text": "Đầu: hộp sọ bình thường, cấu trúc đường giữa bình thường, tiểu não bình thường.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "22 tuần 1 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bất thường môi trên",
+       "source_text": "Mặt: môi trên liên tục.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "22 tuần 1 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "mặt nghiêng",
+       "source_text": "Mặt nghiêng khó đánh giá do thai quay lưng.",
+       "assertion": "UNCERTAIN",
+       "assessment": "LIMITED",
+       "temporality": "22 tuần 1 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "nốt tăng âm trong thất trái",
+       "source_text": "Tim: nốt tăng âm trong thất trái.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "22 tuần 1 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bất thường các đường ra",
+       "source_text": "Các đường ra bình thường.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "22 tuần 1 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "ruột tăng âm, độ hồi âm tương đương xương",
+       "source_text": "Bụng: ruột tăng âm, độ hồi âm tương đương xương.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "22 tuần 1 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bất thường thành bụng",
+       "source_text": "Thành bụng kín.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "22 tuần 1 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "xương cánh tay hai bên ngắn, dưới bách phân vị 5",
+       "source_text": "Chi: xương cánh tay hai bên ngắn, dưới bách phân vị 5.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "22 tuần 1 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bất thường tứ chi",
+       "source_text": "Tứ chi đủ.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "22 tuần 1 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bất thường dây rốn",
+       "source_text": "Phụ: dây rốn 3 mạch.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "22 tuần 1 ngày",
+       "subject": "FETUS"
+      }
+     ],
+     "matched": 12,
+     "fuzzy": [
+      [
+       "bất thường cấu trúc đường giữa của não",
+       "bất thường cấu trúc đường giữa",
+       0.86
+      ],
+      [
+       "bất thường các đường ra của tim",
+       "bất thường các đường ra",
+       0.83
+      ],
+      [
+       "xương cánh tay hai bên ngắn",
+       "xương cánh tay hai bên ngắn, dưới bách phân vị 5",
+       0.71
+      ],
+      [
+       "ruột tăng âm",
+       "ruột tăng âm, độ hồi âm tương đương xương",
+       0.55
+      ]
+     ],
+     "missed": [],
+     "extra": [],
+     "wrong_status": []
+    },
+    {
+     "id": "S16",
+     "failed": false,
+     "seconds": 46.3,
+     "pred": [
+      {
+       "phrase": "bộ phận sinh dục ngoài không xác định rõ giới tính",
+       "source_text": "Bộ phận sinh dục ngoài không xác định rõ giới tính: dương vật nhỏ cong xuống, bìu chẻ đôi, không thấy tinh hoàn trong bìu.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "30 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "dương vật nhỏ",
+       "source_text": "Bộ phận sinh dục ngoài không xác định rõ giới tính: dương vật nhỏ cong xuống, bìu chẻ đôi, không thấy tinh hoàn trong bìu.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "30 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "dương vật cong xuống",
+       "source_text": "Bộ phận sinh dục ngoài không xác định rõ giới tính: dương vật nhỏ cong xuống, bìu chẻ đôi, không thấy tinh hoàn trong bìu.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "30 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bìu chẻ đôi",
+       "source_text": "Bộ phận sinh dục ngoài không xác định rõ giới tính: dương vật nhỏ cong xuống, bìu chẻ đôi, không thấy tinh hoàn trong bìu.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "30 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "không thấy tinh hoàn trong bìu",
+       "source_text": "Bộ phận sinh dục ngoài không xác định rõ giới tính: dương vật nhỏ cong xuống, bìu chẻ đôi, không thấy tinh hoàn trong bìu.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "30 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "lỗ tiểu",
+       "source_text": "Lỗ tiểu không quan sát được do tư thế.",
+       "assertion": "UNCERTAIN",
+       "assessment": "NOT_ASSESSABLE",
+       "temporality": "30 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "thai nhỏ so với tuổi",
+       "source_text": "Thai nhỏ so với tuổi, chu vi bụng và chu vi đầu dưới bách phân vị 5.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "30 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "chu vi bụng dưới bách phân vị 5",
+       "source_text": "Thai nhỏ so với tuổi, chu vi bụng và chu vi đầu dưới bách phân vị 5.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "30 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "chu vi đầu dưới bách phân vị 5",
+       "source_text": "Thai nhỏ so với tuổi, chu vi bụng và chu vi đầu dưới bách phân vị 5.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "30 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "dây rốn quấn cổ một vòng",
+       "source_text": "Dây rốn quấn cổ một vòng.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "30 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "tiền sử dùng thuốc chống động kinh valproat trong ba tháng đầu",
+       "source_text": "Mẹ có tiền sử dùng thuốc chống động kinh valproat trong ba tháng đầu.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": null,
+       "subject": "MOTHER"
+      }
+     ],
+     "matched": 11,
+     "fuzzy": [
+      [
+       "dùng thuốc chống động kinh valproat trong ba tháng đầu",
+       "tiền sử dùng thuốc chống động kinh valproat trong ba tháng đầu",
+       0.91
+      ]
+     ],
+     "missed": [],
+     "extra": [],
+     "wrong_status": []
+    },
+    {
+     "id": "S17",
+     "failed": false,
+     "seconds": 17.9,
+     "pred": [
+      {
+       "phrase": "não phẳng",
+       "source_text": "MRI thai 32 tuần: não phẳng, vỏ não dày, không thấy rãnh Sylvius.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "32 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "vỏ não dày",
+       "source_text": "MRI thai 32 tuần: não phẳng, vỏ não dày, không thấy rãnh Sylvius.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "32 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "không thấy rãnh Sylvius",
+       "source_text": "MRI thai 32 tuần: não phẳng, vỏ não dày, không thấy rãnh Sylvius.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "32 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "thể chai mỏng",
+       "source_text": "Thể chai mỏng và ngắn.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "32 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "thể chai ngắn",
+       "source_text": "Thể chai mỏng và ngắn.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "32 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bất thường thân não",
+       "source_text": "Thân não, tiểu não chưa thấy bất thường.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "32 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bất thường tiểu não",
+       "source_text": "Thân não, tiểu não chưa thấy bất thường.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "32 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "xuất huyết trong sọ",
+       "source_text": "Không có xuất huyết trong sọ.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "32 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "chu vi đầu dưới –3 SD",
+       "source_text": "Chu vi đầu dưới –3 SD.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "32 tuần",
+       "subject": "FETUS"
+      }
+     ],
+     "matched": 9,
+     "fuzzy": [],
+     "missed": [],
+     "extra": [],
+     "wrong_status": []
+    },
+    {
+     "id": "S18",
+     "failed": false,
+     "seconds": 31.1,
+     "pred": [
+      {
+       "phrase": "khối tăng âm đồng nhất ở lồng ngực trái",
+       "source_text": "Lồng ngực trái có khối tăng âm đồng nhất chiếm 2/3 thể tích, có mạch máu nuôi từ động mạch chủ ngực.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "23 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "mạch máu nuôi từ động mạch chủ ngực",
+       "source_text": "Lồng ngực trái có khối tăng âm đồng nhất chiếm 2/3 thể tích, có mạch máu nuôi từ động mạch chủ ngực.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "23 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "tim bị đẩy sang phải",
+       "source_text": "Tim bị đẩy sang phải.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "23 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "nang trong khối",
+       "source_text": "Không thấy nang trong khối.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "23 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bất thường cơ hoành hai bên",
+       "source_text": "Cơ hoành hai bên liên tục.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "23 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "tràn dịch màng phổi trái lượng ít",
+       "source_text": "Tràn dịch màng phổi trái lượng ít.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "23 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bất thường Doppler ống tĩnh mạch",
+       "source_text": "Chưa đánh giá Doppler ống tĩnh mạch.",
+       "assertion": "UNCERTAIN",
+       "assessment": "NOT_ASSESSED",
+       "temporality": "23 tuần",
+       "subject": "FETUS"
+      }
+     ],
+     "matched": 6,
+     "fuzzy": [
+      [
+       "tràn dịch màng phổi trái",
+       "tràn dịch màng phổi trái lượng ít",
+       0.83
+      ],
+      [
+       "Doppler ống tĩnh mạch",
+       "bất thường Doppler ống tĩnh mạch",
+       0.8
+      ],
+      [
+       "khối tăng âm đồng nhất ở lồng ngực trái có mạch máu nuôi từ động mạch chủ ngực",
+       "khối tăng âm đồng nhất ở lồng ngực trái",
+       0.72
+      ],
+      [
+       "nang trong khối ở lồng ngực trái",
+       "nang trong khối",
+       0.6
+      ]
+     ],
+     "missed": [],
+     "extra": [
+      {
+       "phrase": "mạch máu nuôi từ động mạch chủ ngực",
+       "source_text": "Lồng ngực trái có khối tăng âm đồng nhất chiếm 2/3 thể tích, có mạch máu nuôi từ động mạch chủ ngực.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "23 tuần",
+       "subject": "FETUS"
+      }
+     ],
+     "wrong_status": []
+    },
+    {
+     "id": "S19",
+     "failed": false,
+     "seconds": 5.9,
+     "pred": [
+      {
+       "phrase": "đa ối",
+       "source_text": "Thai 27 tuần, đa ối (chỉ số ối 30 cm).",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "27 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "dấu hiệu bóng đôi ở bụng trên",
+       "source_text": "Dấu hiệu bóng đôi ở bụng trên.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "27 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "giãn phần ruột còn lại",
+       "source_text": "Phần ruột còn lại không giãn.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "27 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "kênh nhĩ thất chung thể hoàn toàn",
+       "source_text": "Tim: kênh nhĩ thất chung thể hoàn toàn nghi ngờ, cần siêu âm tim thai lại.",
+       "assertion": "SUSPECTED",
+       "assessment": "ASSESSED",
+       "temporality": "27 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "nếp da gáy dày",
+       "source_text": "Nếp da gáy dày 7 mm.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "27 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "xương cánh tay ngắn",
+       "source_text": "Xương cánh tay ngắn nhẹ.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "27 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "ngón tay út hai bên cong vào trong",
+       "source_text": "Ngón tay út hai bên cong vào trong.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "27 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "khoảng cách giữa ngón chân cái và ngón hai rộng",
+       "source_text": "Khoảng cách giữa ngón chân cái và ngón hai rộng.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "27 tuần",
+       "subject": "FETUS"
+      }
+     ],
+     "matched": 8,
+     "fuzzy": [
+      [
+       "xương cánh tay ngắn nhẹ",
+       "xương cánh tay ngắn",
+       0.89
+      ]
+     ],
+     "missed": [],
+     "extra": [],
+     "wrong_status": []
+    },
+    {
+     "id": "S20",
+     "failed": false,
+     "seconds": 13.2,
+     "pred": [
+      {
+       "phrase": "thai cử động ít",
+       "source_text": "Thai 18 tuần, thai phụ đến khám vì thấy thai cử động ít.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "18 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bàn tay trái cụt ngang mức cổ tay",
+       "source_text": "Bàn tay trái cụt ngang mức cổ tay, bàn tay phải có ngón ba và ngón bốn dính nhau, đầu các ngón này phù to.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "18 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bàn tay phải có ngón ba và ngón bốn dính nhau",
+       "source_text": "Bàn tay trái cụt ngang mức cổ tay, bàn tay phải có ngón ba và ngón bốn dính nhau, đầu các ngón này phù to.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "18 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "đầu ngón ba và ngón bốn bàn tay phải phù to",
+       "source_text": "Bàn tay trái cụt ngang mức cổ tay, bàn tay phải có ngón ba và ngón bốn dính nhau, đầu các ngón này phù to.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "18 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "cẳng chân phải có vòng thắt",
+       "source_text": "Cẳng chân phải có vòng thắt, phần dưới vòng thắt phù nề.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "18 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "phần dưới vòng thắt cẳng chân phải phù nề",
+       "source_text": "Cẳng chân phải có vòng thắt, phần dưới vòng thắt phù nề.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "18 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "các dải màng mỏng trong buồng ối bám vào chi",
+       "source_text": "Trong buồng ối có các dải màng mỏng bám vào chi.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "18 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "khe hở mặt",
+       "source_text": "Không thấy khe hở mặt, sọ não liên tục.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "18 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bất thường sọ não",
+       "source_text": "Không thấy khe hở mặt, sọ não liên tục.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "18 tuần",
+       "subject": "FETUS"
+      }
+     ],
+     "matched": 9,
+     "fuzzy": [
+      [
+       "dải màng mỏng trong buồng ối bám vào chi",
+       "các dải màng mỏng trong buồng ối bám vào chi",
+       0.95
+      ],
+      [
+       "ngón ba và ngón bốn bàn tay phải dính nhau",
+       "bàn tay phải có ngón ba và ngón bốn dính nhau",
+       0.95
+      ]
+     ],
+     "missed": [],
+     "extra": [],
+     "wrong_status": []
+    },
+    {
+     "id": "S21",
+     "failed": false,
+     "seconds": 6.5,
+     "pred": [
+      {
+       "phrase": "hai khuỷu duỗi cứng",
+       "source_text": "Hai khuỷu duỗi cứng, hai cổ tay gấp, các ngón tay co gập cố định trong suốt 30 phút khảo sát.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "29 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "hai cổ tay gấp",
+       "source_text": "Hai khuỷu duỗi cứng, hai cổ tay gấp, các ngón tay co gập cố định trong suốt 30 phút khảo sát.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "29 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "các ngón tay co gập cố định",
+       "source_text": "Hai khuỷu duỗi cứng, hai cổ tay gấp, các ngón tay co gập cố định trong suốt 30 phút khảo sát.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "29 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "hai gối duỗi quá mức",
+       "source_text": "Hai gối duỗi quá mức, bàn chân khoèo hai bên.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "29 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bàn chân khoèo hai bên",
+       "source_text": "Hai gối duỗi quá mức, bàn chân khoèo hai bên.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "29 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "thai rất ít cử động",
+       "source_text": "Thai rất ít cử động.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "29 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "hàm dưới nhỏ",
+       "source_text": "Hàm dưới nhỏ, lùi ra sau.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "29 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "hàm dưới lùi ra sau",
+       "source_text": "Hàm dưới nhỏ, lùi ra sau.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "29 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "đa ối",
+       "source_text": "Đa ối.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "29 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "dạ dày nhỏ",
+       "source_text": "Dạ dày nhỏ.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "29 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bệnh lý nhược cơ",
+       "source_text": "Mẹ không có bệnh lý nhược cơ.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "29 tuần",
+       "subject": "MOTHER"
+      }
+     ],
+     "matched": 11,
+     "fuzzy": [
+      [
+       "nhược cơ",
+       "bệnh lý nhược cơ",
+       0.67
+      ]
+     ],
+     "missed": [],
+     "extra": [],
+     "wrong_status": []
+    },
+    {
+     "id": "S22",
+     "failed": false,
+     "seconds": 7.5,
+     "pred": [
+      {
+       "phrase": "nang đám rối mạch mạc hai bên",
+       "source_text": "Nang đám rối mạch mạc hai bên thấy ở lần khám 20 tuần, nay không còn.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "28 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "thận phải ứ nước",
+       "source_text": "Thận phải ứ nước, bể thận 12 mm (lần trước 8 mm), có giãn đài thận.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "28 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "giãn đài thận phải",
+       "source_text": "Thận phải ứ nước, bể thận 12 mm (lần trước 8 mm), có giãn đài thận.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "28 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bất thường thận trái",
+       "source_text": "Thận trái bình thường.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "28 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "giãn niệu quản phải",
+       "source_text": "Niệu quản phải chưa thấy giãn.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "28 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bàng quang",
+       "source_text": "Bàng quang chưa thấy, hẹn khảo sát lại sau 30 phút.",
+       "assertion": "UNCERTAIN",
+       "assessment": "LIMITED",
+       "temporality": "28 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "tim",
+       "source_text": "Tim chưa khảo sát lần này.",
+       "assertion": "UNCERTAIN",
+       "assessment": "NOT_ASSESSED",
+       "temporality": "28 tuần",
+       "subject": "FETUS"
+      }
+     ],
+     "matched": 7,
+     "fuzzy": [],
+     "missed": [],
+     "extra": [],
+     "wrong_status": []
+    },
+    {
+     "id": "S23",
+     "failed": false,
+     "seconds": 21.4,
+     "pred": [
+      {
+       "phrase": "Dandy-Walker",
+       "source_text": "MRI não thai 30 tuần: Dandy-Walker; thuỳ nhộng thiểu sản + xoay lên; não thất IV giãn thông với bể lớn; lều tiểu não nâng cao; thể chai: bình thường; vỏ não: chưa đánh giá được do nhiễu động.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "30 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "thuỳ nhộng thiểu sản",
+       "source_text": "MRI não thai 30 tuần: Dandy-Walker; thuỳ nhộng thiểu sản + xoay lên; não thất IV giãn thông với bể lớn; lều tiểu não nâng cao; thể chai: bình thường; vỏ não: chưa đánh giá được do nhiễu động.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "30 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "thuỳ nhộng xoay lên",
+       "source_text": "MRI não thai 30 tuần: Dandy-Walker; thuỳ nhộng thiểu sản + xoay lên; não thất IV giãn thông với bể lớn; lều tiểu não nâng cao; thể chai: bình thường; vỏ não: chưa đánh giá được do nhiễu động.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "30 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "não thất IV giãn thông với bể lớn",
+       "source_text": "MRI não thai 30 tuần: Dandy-Walker; thuỳ nhộng thiểu sản + xoay lên; não thất IV giãn thông với bể lớn; lều tiểu não nâng cao; thể chai: bình thường; vỏ não: chưa đánh giá được do nhiễu động.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "30 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "lều tiểu não nâng cao",
+       "source_text": "MRI não thai 30 tuần: Dandy-Walker; thuỳ nhộng thiểu sản + xoay lên; não thất IV giãn thông với bể lớn; lều tiểu não nâng cao; thể chai: bình thường; vỏ não: chưa đánh giá được do nhiễu động.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "30 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bất thường thể chai",
+       "source_text": "MRI não thai 30 tuần: Dandy-Walker; thuỳ nhộng thiểu sản + xoay lên; não thất IV giãn thông với bể lớn; lều tiểu não nâng cao; thể chai: bình thường; vỏ não: chưa đánh giá được do nhiễu động.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "30 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "vỏ não",
+       "source_text": "MRI não thai 30 tuần: Dandy-Walker; thuỳ nhộng thiểu sản + xoay lên; não thất IV giãn thông với bể lớn; lều tiểu não nâng cao; thể chai: bình thường; vỏ não: chưa đánh giá được do nhiễu động.",
+       "assertion": "UNCERTAIN",
+       "assessment": "NOT_ASSESSABLE",
+       "temporality": "30 tuần",
+       "subject": "FETUS"
+      }
+     ],
+     "matched": 7,
+     "fuzzy": [],
+     "missed": [],
+     "extra": [],
+     "wrong_status": []
+    },
+    {
+     "id": "S24",
+     "failed": false,
+     "seconds": 4.7,
+     "pred": [
+      {
+       "phrase": "nhịp tim thai không đều",
+       "source_text": "Thai 33 tuần, nhịp tim thai không đều, nhiều ngoại tâm thu nhĩ.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "33 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "nhiều ngoại tâm thu nhĩ",
+       "source_text": "Thai 33 tuần, nhịp tim thai không đều, nhiều ngoại tâm thu nhĩ.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "33 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "van ba lá bám thấp",
+       "source_text": "Van ba lá bám thấp, hở van ba lá nặng.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "33 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "hở van ba lá nặng",
+       "source_text": "Van ba lá bám thấp, hở van ba lá nặng.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "33 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "nhĩ phải giãn rất lớn",
+       "source_text": "Nhĩ phải giãn rất lớn, tim to chiếm gần hết lồng ngực.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "33 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "tim to chiếm gần hết lồng ngực",
+       "source_text": "Nhĩ phải giãn rất lớn, tim to chiếm gần hết lồng ngực.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "33 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "động mạch phổi nhỏ",
+       "source_text": "Động mạch phổi nhỏ, nghi tịt van động mạch phổi chức năng.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "33 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "tịt van động mạch phổi chức năng",
+       "source_text": "Động mạch phổi nhỏ, nghi tịt van động mạch phổi chức năng.",
+       "assertion": "SUSPECTED",
+       "assessment": "ASSESSED",
+       "temporality": "33 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "thiểu sản phổi hai bên",
+       "source_text": "Phổi hai bên có thể thiểu sản.",
+       "assertion": "SUSPECTED",
+       "assessment": "ASSESSED",
+       "temporality": "33 tuần",
+       "subject": "FETUS"
+      }
+     ],
+     "matched": 9,
+     "fuzzy": [
+      [
+       "ngoại tâm thu nhĩ",
+       "nhiều ngoại tâm thu nhĩ",
+       0.89
+      ]
+     ],
+     "missed": [],
+     "extra": [],
+     "wrong_status": []
+    },
+    {
+     "id": "S25",
+     "failed": false,
+     "seconds": 6.7,
+     "pred": [
+      {
+       "phrase": "hộp sọ dạng đầu ngắn",
+       "source_text": "Hộp sọ: dạng đầu ngắn (chỉ số đầu 92%), khớp sọ vành hai bên khó thấy (nghi dính khớp sọ sớm (khớp vành)).",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "32 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "dính khớp sọ sớm (khớp vành) hai bên",
+       "source_text": "Hộp sọ: dạng đầu ngắn (chỉ số đầu 92%), khớp sọ vành hai bên khó thấy (nghi dính khớp sọ sớm (khớp vành)).",
+       "assertion": "SUSPECTED",
+       "assessment": "LIMITED",
+       "temporality": "32 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "trán cao",
+       "source_text": "Mặt: trán cao, mặt giữa phẳng, hai mắt xa nhau, lồi mắt nhẹ.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "32 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "mặt giữa phẳng",
+       "source_text": "Mặt: trán cao, mặt giữa phẳng, hai mắt xa nhau, lồi mắt nhẹ.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "32 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "hai mắt xa nhau",
+       "source_text": "Mặt: trán cao, mặt giữa phẳng, hai mắt xa nhau, lồi mắt nhẹ.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "32 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "lồi mắt nhẹ",
+       "source_text": "Mặt: trán cao, mặt giữa phẳng, hai mắt xa nhau, lồi mắt nhẹ.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "32 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "dính toàn bộ các ngón tay hai bên dạng 'găng tay'",
+       "source_text": "Bàn tay: dính toàn bộ các ngón tay hai bên dạng 'găng tay'; bàn chân chưa đánh giá rõ do tư thế.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "32 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bất thường bàn chân",
+       "source_text": "Bàn tay: dính toàn bộ các ngón tay hai bên dạng 'găng tay'; bàn chân chưa đánh giá rõ do tư thế.",
+       "assertion": "UNCERTAIN",
+       "assessment": "NOT_ASSESSABLE",
+       "temporality": "32 tuần",
+       "subject": "FETUS"
+      }
+     ],
+     "matched": 8,
+     "fuzzy": [
+      [
+       "dính toàn bộ các ngón tay hai bên",
+       "dính toàn bộ các ngón tay hai bên dạng 'găng tay'",
+       0.89
+      ],
+      [
+       "dính khớp sọ sớm khớp vành",
+       "dính khớp sọ sớm (khớp vành) hai bên",
+       0.83
+      ],
+      [
+       "bàn chân",
+       "bất thường bàn chân",
+       0.67
+      ],
+      [
+       "đầu ngắn",
+       "hộp sọ dạng đầu ngắn",
+       0.57
+      ]
+     ],
+     "missed": [],
+     "extra": [],
+     "wrong_status": [
+      {
+       "gold": {
+        "phrase": "dính khớp sọ sớm khớp vành",
+        "assertion": "SUSPECTED",
+        "assessment": "ASSESSED",
+        "subject": "FETUS"
+       },
+       "pred": {
+        "phrase": "dính khớp sọ sớm (khớp vành) hai bên",
+        "source_text": "Hộp sọ: dạng đầu ngắn (chỉ số đầu 92%), khớp sọ vành hai bên khó thấy (nghi dính khớp sọ sớm (khớp vành)).",
+        "assertion": "SUSPECTED",
+        "assessment": "LIMITED",
+        "temporality": "32 tuần",
+        "subject": "FETUS"
+       },
+       "fields": [
+        "assessment"
+       ]
+      },
+      {
+       "gold": {
+        "phrase": "bàn chân",
+        "assertion": "UNCERTAIN",
+        "assessment": "LIMITED",
+        "subject": "FETUS"
+       },
+       "pred": {
+        "phrase": "bất thường bàn chân",
+        "source_text": "Bàn tay: dính toàn bộ các ngón tay hai bên dạng 'găng tay'; bàn chân chưa đánh giá rõ do tư thế.",
+        "assertion": "UNCERTAIN",
+        "assessment": "NOT_ASSESSABLE",
+        "temporality": "32 tuần",
+        "subject": "FETUS"
+       },
+       "fields": [
+        "assessment"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "S26",
+     "failed": false,
+     "seconds": 5.2,
+     "pred": [
+      {
+       "phrase": "hai thận nằm thấp",
+       "source_text": "Hai thận nằm thấp, cực dưới hai thận dính nhau trước cột sống, hình móng ngựa.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "24 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "cực dưới hai thận dính nhau trước cột sống, hình móng ngựa",
+       "source_text": "Hai thận nằm thấp, cực dưới hai thận dính nhau trước cột sống, hình móng ngựa.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "24 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "giãn đài bể thận",
+       "source_text": "Không thấy giãn đài bể thận.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "24 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "nang buồng trứng phải",
+       "source_text": "Nghi nang buồng trứng phải, kích thước 25 mm.",
+       "assertion": "SUSPECTED",
+       "assessment": "ASSESSED",
+       "temporality": "24 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bất thường ruột",
+       "source_text": "Ruột: chưa thấy bất thường.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "24 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "một động mạch rốn duy nhất",
+       "source_text": "Dây rốn hai mạch: một động mạch rốn duy nhất.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "24 tuần",
+       "subject": "FETUS"
+      }
+     ],
+     "matched": 6,
+     "fuzzy": [],
+     "missed": [],
+     "extra": [],
+     "wrong_status": []
+    },
+    {
+     "id": "S27",
+     "failed": false,
+     "seconds": 35.0,
+     "pred": [
+      {
+       "phrase": "sốt",
+       "source_text": "Thai 26 tuần, mẹ sốt phát ban lúc thai 9 tuần, xét nghiệm IgM CMV dương tính, siêu âm thấy nhiều nốt vôi hoá quanh não thất, có dải tăng âm ở vùng đồi thị, ruột tăng âm, gan to có vài nốt vôi hoá trong nhu mô, lách to, thai nhỏ so với tuổi, chu vi đầu nhỏ, ối bình thường.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "9 tuần",
+       "subject": "MOTHER"
+      },
+      {
+       "phrase": "phát ban",
+       "source_text": "Thai 26 tuần, mẹ sốt phát ban lúc thai 9 tuần, xét nghiệm IgM CMV dương tính, siêu âm thấy nhiều nốt vôi hoá quanh não thất, có dải tăng âm ở vùng đồi thị, ruột tăng âm, gan to có vài nốt vôi hoá trong nhu mô, lách to, thai nhỏ so với tuổi, chu vi đầu nhỏ, ối bình thường.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "9 tuần",
+       "subject": "MOTHER"
+      },
+      {
+       "phrase": "nhiều nốt vôi hoá quanh não thất",
+       "source_text": "Thai 26 tuần, mẹ sốt phát ban lúc thai 9 tuần, xét nghiệm IgM CMV dương tính, siêu âm thấy nhiều nốt vôi hoá quanh não thất, có dải tăng âm ở vùng đồi thị, ruột tăng âm, gan to có vài nốt vôi hoá trong nhu mô, lách to, thai nhỏ so với tuổi, chu vi đầu nhỏ, ối bình thường.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "26 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "dải tăng âm ở vùng đồi thị",
+       "source_text": "Thai 26 tuần, mẹ sốt phát ban lúc thai 9 tuần, xét nghiệm IgM CMV dương tính, siêu âm thấy nhiều nốt vôi hoá quanh não thất, có dải tăng âm ở vùng đồi thị, ruột tăng âm, gan to có vài nốt vôi hoá trong nhu mô, lách to, thai nhỏ so với tuổi, chu vi đầu nhỏ, ối bình thường.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "26 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "ruột tăng âm",
+       "source_text": "Thai 26 tuần, mẹ sốt phát ban lúc thai 9 tuần, xét nghiệm IgM CMV dương tính, siêu âm thấy nhiều nốt vôi hoá quanh não thất, có dải tăng âm ở vùng đồi thị, ruột tăng âm, gan to có vài nốt vôi hoá trong nhu mô, lách to, thai nhỏ so với tuổi, chu vi đầu nhỏ, ối bình thường.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "26 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "gan to",
+       "source_text": "Thai 26 tuần, mẹ sốt phát ban lúc thai 9 tuần, xét nghiệm IgM CMV dương tính, siêu âm thấy nhiều nốt vôi hoá quanh não thất, có dải tăng âm ở vùng đồi thị, ruột tăng âm, gan to có vài nốt vôi hoá trong nhu mô, lách to, thai nhỏ so với tuổi, chu vi đầu nhỏ, ối bình thường.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "26 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "vài nốt vôi hoá trong nhu mô gan",
+       "source_text": "Thai 26 tuần, mẹ sốt phát ban lúc thai 9 tuần, xét nghiệm IgM CMV dương tính, siêu âm thấy nhiều nốt vôi hoá quanh não thất, có dải tăng âm ở vùng đồi thị, ruột tăng âm, gan to có vài nốt vôi hoá trong nhu mô, lách to, thai nhỏ so với tuổi, chu vi đầu nhỏ, ối bình thường.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "26 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "lách to",
+       "source_text": "Thai 26 tuần, mẹ sốt phát ban lúc thai 9 tuần, xét nghiệm IgM CMV dương tính, siêu âm thấy nhiều nốt vôi hoá quanh não thất, có dải tăng âm ở vùng đồi thị, ruột tăng âm, gan to có vài nốt vôi hoá trong nhu mô, lách to, thai nhỏ so với tuổi, chu vi đầu nhỏ, ối bình thường.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "26 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "thai nhỏ so với tuổi",
+       "source_text": "Thai 26 tuần, mẹ sốt phát ban lúc thai 9 tuần, xét nghiệm IgM CMV dương tính, siêu âm thấy nhiều nốt vôi hoá quanh não thất, có dải tăng âm ở vùng đồi thị, ruột tăng âm, gan to có vài nốt vôi hoá trong nhu mô, lách to, thai nhỏ so với tuổi, chu vi đầu nhỏ, ối bình thường.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "26 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "chu vi đầu nhỏ",
+       "source_text": "Thai 26 tuần, mẹ sốt phát ban lúc thai 9 tuần, xét nghiệm IgM CMV dương tính, siêu âm thấy nhiều nốt vôi hoá quanh não thất, có dải tăng âm ở vùng đồi thị, ruột tăng âm, gan to có vài nốt vôi hoá trong nhu mô, lách to, thai nhỏ so với tuổi, chu vi đầu nhỏ, ối bình thường.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "26 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bất thường nước ối",
+       "source_text": "Thai 26 tuần, mẹ sốt phát ban lúc thai 9 tuần, xét nghiệm IgM CMV dương tính, siêu âm thấy nhiều nốt vôi hoá quanh não thất, có dải tăng âm ở vùng đồi thị, ruột tăng âm, gan to có vài nốt vôi hoá trong nhu mô, lách to, thai nhỏ so với tuổi, chu vi đầu nhỏ, ối bình thường.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "26 tuần",
+       "subject": "FETUS"
+      }
+     ],
+     "matched": 11,
+     "fuzzy": [
+      [
+       "bất thường ối",
+       "bất thường nước ối",
+       0.86
+      ]
+     ],
+     "missed": [],
+     "extra": [],
+     "wrong_status": []
+    },
+    {
+     "id": "S28",
+     "failed": false,
+     "seconds": 12.2,
+     "pred": [
+      {
+       "phrase": "nang bạch huyết vùng cổ lớn, có vách, lan xuống lưng",
+       "source_text": "Nang bạch huyết vùng cổ lớn, có vách, lan xuống lưng.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "14 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "phù da toàn thân",
+       "source_text": "Phù da toàn thân + tràn dịch màng phổi hai bên.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "14 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "tràn dịch màng phổi hai bên",
+       "source_text": "Phù da toàn thân + tràn dịch màng phổi hai bên.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "14 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "hẹp eo động mạch chủ",
+       "source_text": "Tim: nghi hẹp eo động mạch chủ (eo nhỏ, thất phải ưu thế).",
+       "assertion": "SUSPECTED",
+       "assessment": "ASSESSED",
+       "temporality": "14 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "eo động mạch chủ nhỏ",
+       "source_text": "Tim: nghi hẹp eo động mạch chủ (eo nhỏ, thất phải ưu thế).",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "14 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "thất phải ưu thế",
+       "source_text": "Tim: nghi hẹp eo động mạch chủ (eo nhỏ, thất phải ưu thế).",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "14 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "thận",
+       "source_text": "Thận chưa thấy rõ, hẹn lại 16 tuần.",
+       "assertion": "UNCERTAIN",
+       "assessment": "LIMITED",
+       "temporality": "14 tuần",
+       "subject": "FETUS"
+      }
+     ],
+     "matched": 6,
+     "fuzzy": [],
+     "missed": [],
+     "extra": [
+      {
+       "phrase": "eo động mạch chủ nhỏ",
+       "source_text": "Tim: nghi hẹp eo động mạch chủ (eo nhỏ, thất phải ưu thế).",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "14 tuần",
+       "subject": "FETUS"
+      }
+     ],
+     "wrong_status": []
+    },
+    {
+     "id": "S29",
+     "failed": false,
+     "seconds": 5.8,
+     "pred": [
+      {
+       "phrase": "đa ối",
+       "source_text": "Ối: đa ối, chỉ số ối 32 cm.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "30 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "dạ dày nhỏ",
+       "source_text": "Dạ dày: nhỏ, có lúc không thấy.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "30 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "dạ dày có lúc không thấy",
+       "source_text": "Dạ dày: nhỏ, có lúc không thấy.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "30 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "túi cùng thực quản giãn khi thai nuốt",
+       "source_text": "Vùng cổ: túi cùng thực quản giãn khi thai nuốt.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "30 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "nửa đốt sống ngực 10",
+       "source_text": "Cột sống: nửa đốt sống ngực 10, cột sống cong nhẹ.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "30 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "cột sống cong nhẹ",
+       "source_text": "Cột sống: nửa đốt sống ngực 10, cột sống cong nhẹ.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "30 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "không thấy thận trái",
+       "source_text": "Thận: thận trái không thấy.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "30 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "không thấy ngón cái phải",
+       "source_text": "Chi trên: ngón cái phải không thấy, xương quay phải ngắn.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "30 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "xương quay phải ngắn",
+       "source_text": "Chi trên: ngón cái phải không thấy, xương quay phải ngắn.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "30 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bất thường tim trên mặt cắt bốn buồng",
+       "source_text": "Tim: chưa thấy bất thường trên mặt cắt bốn buồng; đường ra chưa khảo sát đủ.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "30 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bất thường đường ra tim",
+       "source_text": "Tim: chưa thấy bất thường trên mặt cắt bốn buồng; đường ra chưa khảo sát đủ.",
+       "assertion": "UNCERTAIN",
+       "assessment": "LIMITED",
+       "temporality": "30 tuần",
+       "subject": "FETUS"
+      }
+     ],
+     "matched": 11,
+     "fuzzy": [
+      [
+       "đường ra của tim",
+       "bất thường đường ra tim",
+       0.67
+      ]
+     ],
+     "missed": [],
+     "extra": [],
+     "wrong_status": []
+    },
+    {
+     "id": "S30",
+     "failed": false,
+     "seconds": 20.2,
+     "pred": [
+      {
+       "phrase": "nhau tiền đạo trung tâm",
+       "source_text": "Nhau tiền đạo trung tâm, nghi cài răng lược vào cơ tử cung.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "35 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "nhau cài răng lược vào cơ tử cung",
+       "source_text": "Nhau tiền đạo trung tâm, nghi cài răng lược vào cơ tử cung.",
+       "assertion": "SUSPECTED",
+       "assessment": "ASSESSED",
+       "temporality": "35 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "dây rốn bám màng",
+       "source_text": "Dây rốn bám màng.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "35 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "nút thắt dây rốn thật",
+       "source_text": "Có nút thắt dây rốn thật? Chưa khẳng định.",
+       "assertion": "UNCERTAIN",
+       "assessment": "LIMITED",
+       "temporality": "35 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "thai ngôi mông",
+       "source_text": "Thai ngôi mông.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "35 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bất thường cân nặng ước lượng",
+       "source_text": "Cân nặng ước lượng 2.400 g, tương xứng tuổi thai.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "35 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bất thường ối",
+       "source_text": "Ối bình thường.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "35 tuần",
+       "subject": "FETUS"
+      }
+     ],
+     "matched": 7,
+     "fuzzy": [
+      [
+       "ngôi mông",
+       "thai ngôi mông",
+       0.8
+      ]
+     ],
+     "missed": [],
+     "extra": [],
+     "wrong_status": [
+      {
+       "gold": {
+        "phrase": "nút thắt dây rốn thật",
+        "assertion": "SUSPECTED",
+        "assessment": "ASSESSED",
+        "subject": "FETUS"
+       },
+       "pred": {
+        "phrase": "nút thắt dây rốn thật",
+        "source_text": "Có nút thắt dây rốn thật? Chưa khẳng định.",
+        "assertion": "UNCERTAIN",
+        "assessment": "LIMITED",
+        "temporality": "35 tuần",
+        "subject": "FETUS"
+       },
+       "fields": [
+        "assertion",
+        "assessment"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "S31",
+     "failed": false,
+     "seconds": 41.4,
+     "pred": [
+      {
+       "phrase": "loạn sản xương",
+       "source_text": "tiền sử con đầu bị loạn sản xương, mất sau sinh (giải trình tự gene: biến thể dị hợp tử FGFR3 p.Arg248Cys)",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": null,
+       "subject": "FAMILY"
+      },
+      {
+       "phrase": "xương dài ngắn",
+       "source_text": "Lần này thai 17 tuần: các xương dài ngắn, xương đùi cong nhẹ, lồng ngực hẹp, hình chuông.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "17 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "xương đùi cong nhẹ",
+       "source_text": "Lần này thai 17 tuần: các xương dài ngắn, xương đùi cong nhẹ, lồng ngực hẹp, hình chuông.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "17 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "lồng ngực hẹp",
+       "source_text": "Lần này thai 17 tuần: các xương dài ngắn, xương đùi cong nhẹ, lồng ngực hẹp, hình chuông.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "17 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "lồng ngực hình chuông",
+       "source_text": "Lần này thai 17 tuần: các xương dài ngắn, xương đùi cong nhẹ, lồng ngực hẹp, hình chuông.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "17 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "gãy xương",
+       "source_text": "Chưa thấy gãy xương.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "17 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "đầu to so với thân",
+       "source_text": "Đầu to so với thân, trán dô.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "17 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "trán dô",
+       "source_text": "Đầu to so với thân, trán dô.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "17 tuần",
+       "subject": "FETUS"
+      }
+     ],
+     "matched": 8,
+     "fuzzy": [
+      [
+       "các xương dài ngắn",
+       "xương dài ngắn",
+       0.86
+      ]
+     ],
+     "missed": [
+      {
+       "phrase": "mất sau sinh",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "subject": "FAMILY"
+      },
+      {
+       "phrase": "cùng huyết thống",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "subject": "FAMILY"
+      }
+     ],
+     "extra": [],
+     "wrong_status": []
+    },
+    {
+     "id": "S32",
+     "failed": false,
+     "seconds": 10.2,
+     "pred": [
+      {
+       "phrase": "không thấy vòm sọ",
+       "source_text": "Không thấy vòm sọ, mô não lộ ra trong nước ối.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "13 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "mô não lộ ra trong nước ối",
+       "source_text": "Không thấy vòm sọ, mô não lộ ra trong nước ối.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "13 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bất thường cử động tứ chi",
+       "source_text": "Tứ chi cử động bình thường.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "13 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "đa ối nhẹ",
+       "source_text": "Đa ối nhẹ.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "13 tuần",
+       "subject": "FETUS"
+      }
+     ],
+     "matched": 4,
+     "fuzzy": [],
+     "missed": [],
+     "extra": [],
+     "wrong_status": []
+    },
+    {
+     "id": "S33",
+     "failed": false,
+     "seconds": 26.7,
+     "pred": [
+      {
+       "phrase": "tràn dịch màng tinh hoàn hai bên, lượng ít",
+       "source_text": "Kiểm tra lại 34 tuần: tràn dịch màng tinh hoàn hai bên, lượng ít.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "34 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "thận hai bên ứ nước",
+       "source_text": "Thận hai bên không ứ nước.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "34 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bất thường tinh hoàn",
+       "source_text": "Tinh hoàn đã xuống bìu.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "34 tuần",
+       "subject": "FETUS"
+      }
+     ],
+     "matched": 3,
+     "fuzzy": [
+      [
+       "tràn dịch màng tinh hoàn hai bên",
+       "tràn dịch màng tinh hoàn hai bên, lượng ít",
+       0.88
+      ]
+     ],
+     "missed": [],
+     "extra": [],
+     "wrong_status": []
+    },
+    {
+     "id": "S34",
+     "failed": false,
+     "seconds": 23.8,
+     "pred": [
+      {
+       "phrase": "bất sản thể chai",
+       "source_text": "Theo dõi bất sản thể chai: không thấy khoang vách trong suốt, sừng trán não thất bên tách xa nhau, hình giọt nước.",
+       "assertion": "SUSPECTED",
+       "assessment": "ASSESSED",
+       "temporality": "21 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "không thấy khoang vách trong suốt",
+       "source_text": "Theo dõi bất sản thể chai: không thấy khoang vách trong suốt, sừng trán não thất bên tách xa nhau, hình giọt nước.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "21 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "sừng trán não thất bên tách xa nhau",
+       "source_text": "Theo dõi bất sản thể chai: không thấy khoang vách trong suốt, sừng trán não thất bên tách xa nhau, hình giọt nước.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "21 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "não thất bên hình giọt nước",
+       "source_text": "Theo dõi bất sản thể chai: không thấy khoang vách trong suốt, sừng trán não thất bên tách xa nhau, hình giọt nước.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "21 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "u cơ vân",
+       "source_text": "Tim: theo dõi u cơ vân — có hai khối tăng âm trong vách liên thất và thành thất trái.",
+       "assertion": "SUSPECTED",
+       "assessment": "ASSESSED",
+       "temporality": "21 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bất thường thận",
+       "source_text": "Thận: bình thường.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "21 tuần",
+       "subject": "FETUS"
+      }
+     ],
+     "matched": 6,
+     "fuzzy": [
+      [
+       "u cơ vân tim",
+       "u cơ vân",
+       0.86
+      ]
+     ],
+     "missed": [],
+     "extra": [],
+     "wrong_status": []
+    },
+    {
+     "id": "S35",
+     "failed": false,
+     "seconds": 5.9,
+     "pred": [
+      {
+       "phrase": "tay phải 6 ngón, ngón thừa phía ngón út, có xương",
+       "source_text": "+ Tay phải: 6 ngón, ngón thừa phía ngón út, có xương.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "20 tuần 5 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bất thường tay trái",
+       "source_text": "+ Tay trái: 5 ngón, bình thường.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "20 tuần 5 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bàn chân phải vẹo trong",
+       "source_text": "+ Chân phải: bàn chân vẹo trong.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "20 tuần 5 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bất thường chân trái",
+       "source_text": "+ Chân trái: khó đánh giá do bị chân phải che.",
+       "assertion": "UNCERTAIN",
+       "assessment": "LIMITED",
+       "temporality": "20 tuần 5 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bất thường xương dài",
+       "source_text": "Các xương dài đo được tương xứng tuổi thai.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "20 tuần 5 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bất thường môi",
+       "source_text": "Mặt: môi, mũi bình thường, cằm nhỏ.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "20 tuần 5 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bất thường mũi",
+       "source_text": "Mặt: môi, mũi bình thường, cằm nhỏ.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "20 tuần 5 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "cằm nhỏ",
+       "source_text": "Mặt: môi, mũi bình thường, cằm nhỏ.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "20 tuần 5 ngày",
+       "subject": "FETUS"
+      }
+     ],
+     "matched": 8,
+     "fuzzy": [
+      [
+       "bất thường các xương dài",
+       "bất thường xương dài",
+       0.89
+      ],
+      [
+       "chân trái",
+       "bất thường chân trái",
+       0.67
+      ]
+     ],
+     "missed": [],
+     "extra": [],
+     "wrong_status": []
+    },
+    {
+     "id": "S36",
+     "failed": false,
+     "seconds": 8.6,
+     "pred": [
+      {
+       "phrase": "thoát vị hoành trái",
+       "source_text": "Thai 24 tuần 2 ngày, thoát vị hoành trái: dạ dày và quai ruột nằm trong lồng ngực trái, tim bị đẩy sang phải.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "24 tuần 2 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "dạ dày nằm trong lồng ngực trái",
+       "source_text": "Thai 24 tuần 2 ngày, thoát vị hoành trái: dạ dày và quai ruột nằm trong lồng ngực trái, tim bị đẩy sang phải.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "24 tuần 2 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "quai ruột nằm trong lồng ngực trái",
+       "source_text": "Thai 24 tuần 2 ngày, thoát vị hoành trái: dạ dày và quai ruột nằm trong lồng ngực trái, tim bị đẩy sang phải.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "24 tuần 2 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "tim bị đẩy sang phải",
+       "source_text": "Thai 24 tuần 2 ngày, thoát vị hoành trái: dạ dày và quai ruột nằm trong lồng ngực trái, tim bị đẩy sang phải.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "24 tuần 2 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "gan lên ngực",
+       "source_text": "Gan chưa thấy lên ngực.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "24 tuần 2 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "phổi phải nhỏ",
+       "source_text": "Phổi phải nhỏ.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "24 tuần 2 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "thông liên nhĩ lỗ thứ phát nhỏ",
+       "source_text": "Tim kèm thông liên nhĩ lỗ thứ phát nhỏ.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "24 tuần 2 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bất thường thận",
+       "source_text": "Thận, chi chưa đánh giá kỹ.",
+       "assertion": "UNCERTAIN",
+       "assessment": "LIMITED",
+       "temporality": "24 tuần 2 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bất thường chi",
+       "source_text": "Thận, chi chưa đánh giá kỹ.",
+       "assertion": "UNCERTAIN",
+       "assessment": "LIMITED",
+       "temporality": "24 tuần 2 ngày",
+       "subject": "FETUS"
+      }
+     ],
+     "matched": 8,
+     "fuzzy": [
+      [
+       "dạ dày và quai ruột nằm trong lồng ngực trái",
+       "quai ruột nằm trong lồng ngực trái",
+       0.82
+      ],
+      [
+       "chi",
+       "bất thường chi",
+       0.5
+      ],
+      [
+       "thận",
+       "bất thường thận",
+       0.5
+      ]
+     ],
+     "missed": [],
+     "extra": [
+      {
+       "phrase": "dạ dày nằm trong lồng ngực trái",
+       "source_text": "Thai 24 tuần 2 ngày, thoát vị hoành trái: dạ dày và quai ruột nằm trong lồng ngực trái, tim bị đẩy sang phải.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "24 tuần 2 ngày",
+       "subject": "FETUS"
+      }
+     ],
+     "wrong_status": []
+    },
+    {
+     "id": "S37",
+     "failed": false,
+     "seconds": 8.0,
+     "pred": [
+      {
+       "phrase": "béo phì",
+       "source_text": "Thai phụ 41 tuổi, béo phì (BMI 36), đái tháo đường thai kỳ phát hiện tuần 24 điều trị insulin, tăng huyết áp mạn.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": null,
+       "subject": "MOTHER"
+      },
+      {
+       "phrase": "đái tháo đường thai kỳ",
+       "source_text": "Thai phụ 41 tuổi, béo phì (BMI 36), đái tháo đường thai kỳ phát hiện tuần 24 điều trị insulin, tăng huyết áp mạn.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": null,
+       "subject": "MOTHER"
+      },
+      {
+       "phrase": "tăng huyết áp mạn",
+       "source_text": "Thai phụ 41 tuổi, béo phì (BMI 36), đái tháo đường thai kỳ phát hiện tuần 24 điều trị insulin, tăng huyết áp mạn.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": null,
+       "subject": "MOTHER"
+      },
+      {
+       "phrase": "thai to",
+       "source_text": "Thai 32 tuần: thai to, ước lượng cân nặng trên bách phân vị 95, vách liên thất dày, đa ối nhẹ.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "32 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "ước lượng cân nặng trên bách phân vị 95",
+       "source_text": "Thai 32 tuần: thai to, ước lượng cân nặng trên bách phân vị 95, vách liên thất dày, đa ối nhẹ.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "32 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "vách liên thất dày",
+       "source_text": "Thai 32 tuần: thai to, ước lượng cân nặng trên bách phân vị 95, vách liên thất dày, đa ối nhẹ.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "32 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "đa ối nhẹ",
+       "source_text": "Thai 32 tuần: thai to, ước lượng cân nặng trên bách phân vị 95, vách liên thất dày, đa ối nhẹ.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "32 tuần",
+       "subject": "FETUS"
+      }
+     ],
+     "matched": 6,
+     "fuzzy": [],
+     "missed": [],
+     "extra": [
+      {
+       "phrase": "ước lượng cân nặng trên bách phân vị 95",
+       "source_text": "Thai 32 tuần: thai to, ước lượng cân nặng trên bách phân vị 95, vách liên thất dày, đa ối nhẹ.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "32 tuần",
+       "subject": "FETUS"
+      }
+     ],
+     "wrong_status": []
+    },
+    {
+     "id": "S38",
+     "failed": false,
+     "seconds": 3.6,
+     "pred": [
+      {
+       "phrase": "thoát vị rốn có màng bao chứa ruột",
+       "source_text": "Lần khám trước nghi hở thành bụng, lần này xác định là thoát vị rốn có màng bao, chứa ruột.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "22 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "hở thành bụng",
+       "source_text": "Không thấy hở thành bụng.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "22 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "lộ bàng quang",
+       "source_text": "Không có lộ bàng quang.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "22 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "cột sống đoạn thắt lưng gập góc",
+       "source_text": "Cột sống đoạn thắt lưng gập góc.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "22 tuần",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "chân trái ngắn hơn chân phải",
+       "source_text": "Chân trái ngắn hơn chân phải.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "22 tuần",
+       "subject": "FETUS"
+      }
+     ],
+     "matched": 5,
+     "fuzzy": [],
+     "missed": [],
+     "extra": [],
+     "wrong_status": []
+    },
+    {
+     "id": "S39",
+     "failed": false,
+     "seconds": 4.7,
+     "pred": [
+      {
+       "phrase": "độ mờ da gáy tăng",
+       "source_text": "Độ mờ da gáy tăng; dòng phụt ngược qua van ba lá; sóng a đảo ngược ở ống tĩnh mạch.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "13 tuần 1 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "dòng phụt ngược qua van ba lá",
+       "source_text": "Độ mờ da gáy tăng; dòng phụt ngược qua van ba lá; sóng a đảo ngược ở ống tĩnh mạch.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "13 tuần 1 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "sóng a đảo ngược ở ống tĩnh mạch",
+       "source_text": "Độ mờ da gáy tăng; dòng phụt ngược qua van ba lá; sóng a đảo ngược ở ống tĩnh mạch.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "13 tuần 1 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "nang dây rốn sát chân cuống rốn",
+       "source_text": "Có nang dây rốn sát chân cuống rốn.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "13 tuần 1 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "bàng quang to",
+       "source_text": "Bàng quang to, đường kính dọc 11 mm.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "13 tuần 1 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "khuyết sọ",
+       "source_text": "Không thấy khuyết sọ.",
+       "assertion": "ABSENT",
+       "assessment": "ASSESSED",
+       "temporality": "13 tuần 1 ngày",
+       "subject": "FETUS"
+      }
+     ],
+     "matched": 6,
+     "fuzzy": [],
+     "missed": [],
+     "extra": [],
+     "wrong_status": []
+    },
+    {
+     "id": "S40",
+     "failed": false,
+     "seconds": 9.5,
+     "pred": [
+      {
+       "phrase": "đầu nhỏ",
+       "source_text": "Siêu âm: đầu nhỏ; khe hở môi – vòm miệng đường giữa; mắt nhỏ hai bên, mắt phải nghi không có nhãn cầu; tim: thân chung động mạch; thận hai bên nhiều nang nhỏ, mất phân biệt vỏ tuỷ; thừa ngón sau trục ở cả bốn chi; thoát vị rốn nhỏ chỉ chứa ruột.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "19 tuần 4 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "khe hở môi – vòm miệng đường giữa",
+       "source_text": "Siêu âm: đầu nhỏ; khe hở môi – vòm miệng đường giữa; mắt nhỏ hai bên, mắt phải nghi không có nhãn cầu; tim: thân chung động mạch; thận hai bên nhiều nang nhỏ, mất phân biệt vỏ tuỷ; thừa ngón sau trục ở cả bốn chi; thoát vị rốn nhỏ chỉ chứa ruột.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "19 tuần 4 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "mắt nhỏ hai bên",
+       "source_text": "Siêu âm: đầu nhỏ; khe hở môi – vòm miệng đường giữa; mắt nhỏ hai bên, mắt phải nghi không có nhãn cầu; tim: thân chung động mạch; thận hai bên nhiều nang nhỏ, mất phân biệt vỏ tuỷ; thừa ngón sau trục ở cả bốn chi; thoát vị rốn nhỏ chỉ chứa ruột.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "19 tuần 4 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "không có nhãn cầu mắt phải",
+       "source_text": "Siêu âm: đầu nhỏ; khe hở môi – vòm miệng đường giữa; mắt nhỏ hai bên, mắt phải nghi không có nhãn cầu; tim: thân chung động mạch; thận hai bên nhiều nang nhỏ, mất phân biệt vỏ tuỷ; thừa ngón sau trục ở cả bốn chi; thoát vị rốn nhỏ chỉ chứa ruột.",
+       "assertion": "SUSPECTED",
+       "assessment": "ASSESSED",
+       "temporality": "19 tuần 4 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "thân chung động mạch",
+       "source_text": "Siêu âm: đầu nhỏ; khe hở môi – vòm miệng đường giữa; mắt nhỏ hai bên, mắt phải nghi không có nhãn cầu; tim: thân chung động mạch; thận hai bên nhiều nang nhỏ, mất phân biệt vỏ tuỷ; thừa ngón sau trục ở cả bốn chi; thoát vị rốn nhỏ chỉ chứa ruột.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "19 tuần 4 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "thận hai bên nhiều nang nhỏ",
+       "source_text": "Siêu âm: đầu nhỏ; khe hở môi – vòm miệng đường giữa; mắt nhỏ hai bên, mắt phải nghi không có nhãn cầu; tim: thân chung động mạch; thận hai bên nhiều nang nhỏ, mất phân biệt vỏ tuỷ; thừa ngón sau trục ở cả bốn chi; thoát vị rốn nhỏ chỉ chứa ruột.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "19 tuần 4 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "thận hai bên mất phân biệt vỏ tuỷ",
+       "source_text": "Siêu âm: đầu nhỏ; khe hở môi – vòm miệng đường giữa; mắt nhỏ hai bên, mắt phải nghi không có nhãn cầu; tim: thân chung động mạch; thận hai bên nhiều nang nhỏ, mất phân biệt vỏ tuỷ; thừa ngón sau trục ở cả bốn chi; thoát vị rốn nhỏ chỉ chứa ruột.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "19 tuần 4 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "thừa ngón sau trục ở cả bốn chi",
+       "source_text": "Siêu âm: đầu nhỏ; khe hở môi – vòm miệng đường giữa; mắt nhỏ hai bên, mắt phải nghi không có nhãn cầu; tim: thân chung động mạch; thận hai bên nhiều nang nhỏ, mất phân biệt vỏ tuỷ; thừa ngón sau trục ở cả bốn chi; thoát vị rốn nhỏ chỉ chứa ruột.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "19 tuần 4 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "thoát vị rốn nhỏ chỉ chứa ruột",
+       "source_text": "Siêu âm: đầu nhỏ; khe hở môi – vòm miệng đường giữa; mắt nhỏ hai bên, mắt phải nghi không có nhãn cầu; tim: thân chung động mạch; thận hai bên nhiều nang nhỏ, mất phân biệt vỏ tuỷ; thừa ngón sau trục ở cả bốn chi; thoát vị rốn nhỏ chỉ chứa ruột.",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "temporality": "19 tuần 4 ngày",
+       "subject": "FETUS"
+      },
+      {
+       "phrase": "đoạn cùng cột sống",
+       "source_text": "Đoạn cùng cột sống khó đánh giá do thai nằm sấp.",
+       "assertion": "UNCERTAIN",
+       "assessment": "LIMITED",
+       "temporality": "19 tuần 4 ngày",
+       "subject": "FETUS"
+      }
+     ],
+     "matched": 10,
+     "fuzzy": [
+      [
+       "khe hở vòm miệng đường giữa",
+       "khe hở môi – vòm miệng đường giữa",
+       0.92
+      ]
+     ],
+     "missed": [
+      {
+       "phrase": "khe hở môi đường giữa",
+       "assertion": "PRESENT",
+       "assessment": "ASSESSED",
+       "subject": "FETUS"
+      }
+     ],
+     "extra": [],
+     "wrong_status": []
+    }
+   ]
+  }
+ ]
+}

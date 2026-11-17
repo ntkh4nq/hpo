@@ -1,0 +1,6 @@
+candidates_k = 10                 # T24b: top 10 to the choose step
+search_concurrency = 4
+unmapped_dense_threshold = 0.0    # decided on E1-dev by the cost rule in mapping-plan.md §4.3 (T42); 0.0 = gate off
+model = "vlm"                     # T44: Qwen, free on the gateway; on par with DeepSeek on E1-dev
+thinking = false                  # T44: structured output via function_calling (T11b); Qwen overthinks with thinking on
+timeout = 180                     # seconds per request

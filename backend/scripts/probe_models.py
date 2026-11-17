@@ -7,7 +7,7 @@ Gates (exit 1 if any fails):
 Each LLM gate runs per model, with thinking off and on; latency is printed, not gated.
 
 Run: make probe                       # every model in llm_models.toml
-     python scripts/probe_models.py qwen-35b
+     python scripts/probe_models.py vlm
 """
 
 import math

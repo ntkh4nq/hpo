@@ -10,7 +10,7 @@ from functools import lru_cache
 import numpy as np
 from openai import OpenAI
 
-COLBERT_MODEL = "bge-m3-colbert"
+COLBERT_MODEL = os.environ["COLBERT_MODEL"]
 
 
 @lru_cache(maxsize=1)

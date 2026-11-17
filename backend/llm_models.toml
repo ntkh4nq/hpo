@@ -1,7 +1,7 @@
 # Per-model request parameters that differ between providers (sent as extra_body).
 # Model names are the gateway's names. Add a model here before using it.
 
-[qwen-35b]  # vLLM chat template switch
+[vlm]  # Qwen on vLLM, gateway name "vlm" (was qwen-35b); chat template switch
 thinking_off = { chat_template_kwargs = { enable_thinking = false } }
 thinking_on = { chat_template_kwargs = { enable_thinking = true } }
 
