@@ -1,0 +1,21 @@
+{
+ "split_version": "v1",
+ "hpo_release": "v2026-09-01",
+ "config": "# E3 simulated patients (docs/ranking-plan.md §9). Changing how patients are generated: bump split_version and\n# add a decisions.md row.\n\nsplit_version = \"v1\"\ndev_seed = 1\ntest_seed = 2\ndiseases_per_side = 500\n\n# Probability of keeping a phenotype whose annotation has no frequency (T48 (8)); unlike the ranker's 0.9, so\n# E3 does not favour the frequency-based method.\nmissing_frequency_keep = 0.5\n# Gong 2018: a simulated patient has at least 3 phenotypes; redraw up to max_attempts times.\nmin_terms = 3\nmax_attempts = 100\n# Köhler 2009 / Masino 2014: noise adds half as many unrelated terms as the patient has.\nnoise_ratio = 0.5\n",
+ "git": "3de62d2+dirty",
+ "sides": {
+  "dev": {
+   "pool_diseases": 2630,
+   "diseases": 500,
+   "patients": 2000,
+   "skipped_diseases": 1
+  },
+  "test": {
+   "pool_diseases": 2630,
+   "diseases": 500,
+   "patients": 2000,
+   "skipped_diseases": 0
+  }
+ },
+ "dataset_sha256": "d0b70a2861f40b92e1d21117ac8d2e116a687911d0180e6b2358acbeb50bd8aa"
+}

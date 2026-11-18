@@ -13,5 +13,6 @@ probe:         ; $(RUN) python scripts/probe_models.py
 split-check:   ; $(RUN) python -m evals.split_check.run
 analyze:       ; $(RUN) python -m phenotype.graph "$(TEXT)"
 e2:            ; $(RUN) python -m evals.e2.run
+rank:          ; $(RUN) python -m ranking.rank $(TERMS)
 
-.PHONY: up down migrate seed-download seed embed api web test probe split-check analyze e2
+.PHONY: up down migrate seed-download seed embed api web test probe split-check analyze e2 rank

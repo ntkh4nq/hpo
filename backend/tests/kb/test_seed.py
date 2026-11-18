@@ -57,6 +57,17 @@ def test_ic(db):
     assert one(db, "SELECT ic FROM hpo_term WHERE hpo_id = 'HP:0001629'") > 2
 
 
+def test_ic_counts_only_positive_annotations(db):
+    # zero-frequency rows (0/m) mean "recorded as absent", like NOT: a term reached only through them has no IC
+    positive_under = """EXISTS (SELECT 1 FROM hpo_ancestor a JOIN disease_phenotype dp ON dp.hpo_id = a.hpo_id
+                                WHERE a.ancestor_id = t.hpo_id AND dp.aspect = 'P' AND NOT dp.is_negated
+                                  AND dp.freq_num IS DISTINCT FROM 0 AND dp.freq_pct IS DISTINCT FROM 0
+                                  AND dp.freq_hpo IS DISTINCT FROM 'HP:0040285')"""
+    assert one(db, f"SELECT count(*) FROM hpo_term t WHERE (ic IS NOT NULL) <> {positive_under}") == 0
+    assert one(db, """SELECT count(*) FROM hpo_term t JOIN disease_phenotype dp USING (hpo_id)
+                      WHERE t.ic IS NULL AND dp.freq_num = 0""") > 0
+
+
 def test_negated_annotations_kept(db):
     assert one(db, "SELECT count(*) FROM disease_phenotype WHERE is_negated") > 0
 

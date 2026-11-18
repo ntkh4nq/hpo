@@ -250,10 +250,15 @@ def load(tag: str | None = None) -> None:
         _copy(cur, "gene", ("ncbi_gene_id", "symbol"), genes)
         _copy(cur, "gene_disease", ("ncbi_gene_id", "disease_id", "association_type", "source"), gene_links)
 
-        # IC(t) = -ln(diseases annotated with t or a descendant / all annotated diseases); NOT rows excluded.
+        # IC(t) = -ln(diseases positively annotated with t or a descendant / all positively annotated diseases).
+        # Not positive: NOT rows and zero-frequency rows (0/m, 0%, HP:0040285 Excluded) — HPO documents the NOT
+        # qualifier as being replaced by exact frequencies such as 0/19, so both mean "recorded as absent"
+        # (docs/ranking-plan.md §3.1, §3.3).
         cur.execute("UPDATE hpo_term SET ic = NULL")
         cur.execute("""
-            WITH positive AS (SELECT disease_id, hpo_id FROM disease_phenotype WHERE NOT is_negated AND aspect = 'P'),
+            WITH positive AS (SELECT disease_id, hpo_id FROM disease_phenotype
+                              WHERE NOT is_negated AND aspect = 'P' AND freq_num IS DISTINCT FROM 0
+                                AND freq_pct IS DISTINCT FROM 0 AND freq_hpo IS DISTINCT FROM 'HP:0040285'),
                  total AS (SELECT count(DISTINCT disease_id)::float AS n FROM positive),
                  per_term AS (SELECT a.ancestor_id AS hpo_id, count(DISTINCT p.disease_id) AS k
                               FROM positive p JOIN hpo_ancestor a ON a.hpo_id = p.hpo_id GROUP BY a.ancestor_id)

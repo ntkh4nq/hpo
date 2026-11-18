@@ -1,0 +1,33 @@
+# Phase 4 ranking parameters (docs/ranking-plan.md). Each value names its source; none is tuned on E3-test.
+
+# Scoring method: "ic" | "ppo" | "rrf" (ranking-plan §6). "ppo": chosen on E3-dev by the rule in §10 (T51).
+method = "ppo"
+
+# Weight of a SUSPECTED finding relative to PRESENT (= 1.0). Team assumption, T48 (6).
+suspected_weight = 0.5
+
+# P(q | D) when the annotation has no frequency: p1 = 0.9 in the PhenoBrain source code (ranking-plan §5).
+default_frequency = 0.9
+
+# Likelihood ratio of a phenotype excluded at the disease: 1/1000, as in LIRICAL (Robinson 2020) (ranking-plan §5).
+not_likelihood_ratio = 0.001
+
+# Reciprocal Rank Fusion constant (Cormack 2009), the same as the HPO search engine (T24).
+rrf_k = 60
+
+# Diseases returned with explanations (T48 (5)).
+top_n = 10
+
+# "Not mentioned" phenotypes of a disease: known frequency >= 0.3 (lower bound of HPO "Frequent"), at most 5 (ranking-plan §7).
+unmentioned_min_frequency = 0.3
+unmentioned_limit = 5
+
+# HPO frequency terms -> midpoint of their range (ranking-plan §3.2). Non-zero values equal the PhenoBrain
+# defaults (hpo_reader.py, mode = 1); Excluded (0%) means "recorded as absent".
+[frequency_terms]
+"HP:0040280" = 1.0    # Obligate (100%)
+"HP:0040281" = 0.895  # Very frequent (80-99%)
+"HP:0040282" = 0.545  # Frequent (30-79%)
+"HP:0040283" = 0.17   # Occasional (5-29%)
+"HP:0040284" = 0.025  # Very rare (1-4%)
+"HP:0040285" = 0.0    # Excluded (0%)
