@@ -1,0 +1,3 @@
+# Split check (plan.md phase 3, decisions T31). Item matching: evals/common/matching.toml.
+runs = 1  # 40 DeepSeek requests per run; 3 runs (--runs 3) only when stability is in question (user 2026-11-16: minimise requests)
+concurrency = 4  # parallel model calls per run

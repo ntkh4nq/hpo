@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from kb.db import connect
+from core.db import connect
 
 app = FastAPI(title="HPO assistant")
 

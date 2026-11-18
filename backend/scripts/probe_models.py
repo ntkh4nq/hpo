@@ -6,7 +6,7 @@ Gates (exit 1 if any fails):
   * bge-m3: 1024 dims; Vietnamese term closer to its English HPO label than to an unrelated one
 Each LLM gate runs per model, with thinking off and on; latency is printed, not gated.
 
-Run: make probe                       # every model in llm_models.toml
+Run: make probe                       # every model in core/llm_models.toml
      python scripts/probe_models.py vlm
 """
 
@@ -27,7 +27,7 @@ from pydantic import BaseModel, Field
 
 BASE_URL, API_KEY = os.environ["LLM_BASE_URL"], os.environ["LLM_API_KEY"]
 EMBEDDING_MODEL = os.environ["EMBEDDING_MODEL"]
-MODEL_PARAMS = tomllib.loads((Path(__file__).parents[1] / "llm_models.toml").read_text())
+MODEL_PARAMS = tomllib.loads((Path(__file__).parents[1] / "core" / "llm_models.toml").read_text())
 
 REPORT = (
     "Thai 22 tuần. Nghi thiểu sản xương mũi. Ghi nhận thông liên thất. "

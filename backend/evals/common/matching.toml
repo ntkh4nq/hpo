@@ -1,0 +1,4 @@
+# Phrase matching for the split check and E2 (decisions T31, docs/eval-strategy.md §6: not tuned on results).
+# A model item matches a gold item when the Dice overlap of their word sets is >= match_threshold.
+# 0.5 is a starting guess: "ối" ~ "nước ối" = 0.67, "thận phải ứ nước" ~ "thận trái" = 0.33.
+match_threshold = 0.5

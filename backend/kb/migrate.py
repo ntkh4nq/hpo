@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from kb.db import connect
+from core.db import connect
 
 MIGRATIONS = Path(__file__).resolve().parents[1] / "db" / "migrations"
 

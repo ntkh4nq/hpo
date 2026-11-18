@@ -224,5 +224,5 @@ CLAUDE.md
 data/raw/
 
 # Eval run outputs: local only (results are summarised in docs/decisions.md); the split-check baseline is the reference
-backend/eval/results/*/*.json
-!backend/eval/results/split_check/baseline.json
+backend/evals/*/results/*.json
+!backend/evals/split_check/results/baseline.json
