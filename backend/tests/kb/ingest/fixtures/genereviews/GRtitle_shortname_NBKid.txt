@@ -1,0 +1,2 @@
+#GR_shortname	GR_Title	NBK_id	PMID
+sca20	Spinocerebellar Ataxia Type 20	NBK1471	20301644

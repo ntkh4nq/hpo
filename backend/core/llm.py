@@ -10,9 +10,12 @@ import os
 import tomllib
 from pathlib import Path
 
+from langchain_core.messages import HumanMessage
 from langchain_openai import ChatOpenAI
 from langfuse.langchain import CallbackHandler
 from pydantic import BaseModel
+
+from core.image import data_url
 
 MODEL_PARAMS = tomllib.loads((Path(__file__).with_name("llm_models.toml")).read_text())
 ATTEMPTS = 2  # one retry on any failure: connection, timeout, schema (plan.md phase 3, step 2)
@@ -56,4 +59,20 @@ def invoke_json(system: str, human: str, schema: type[BaseModel], *, thinking: b
             continue
         if out is not None:
             return out
+    return None
+
+
+def describe_image(image_path, prompt: str, *, model: str, timeout: float) -> str | None:
+    """One image + instruction to a vision chat model (thinking off); None when every attempt failed."""
+    llm = chat(model, timeout=timeout)
+    message = HumanMessage(content=[{"type": "text", "text": prompt},
+                                    {"type": "image_url", "image_url": {"url": data_url(image_path)}}])
+    for _ in range(ATTEMPTS):
+        try:
+            out = llm.invoke([message], config={"callbacks": [CallbackHandler()]})
+        except Exception:  # noqa: BLE001 - timeout, gateway error: a failed attempt
+            continue
+        text = out.content.strip() if isinstance(out.content, str) else ""
+        if text:
+            return text
     return None

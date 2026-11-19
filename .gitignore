@@ -222,6 +222,7 @@ docs/
 CLAUDE.md
 # HPO project
 data/raw/
+data/uploads/
 
 # Eval run outputs: local only (results are summarised in docs/decisions.md); the split-check baseline is the reference
 backend/evals/*/results/*.json

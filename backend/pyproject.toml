@@ -12,6 +12,9 @@ dependencies = [
     "langfuse>=5.2",
     "numpy>=2.5.4",
     "langgraph>=1.2.20",
+    "docling>=2.150.1",
+    "tokenizers>=0.23.3",
+    "python-multipart>=0.0.34",
 ]
 
 [dependency-groups]

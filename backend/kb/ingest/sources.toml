@@ -1,0 +1,44 @@
+# Layer 3 sources (docs/ingestion-plan.md §1.3, §2, Appendix B). URLs, licences and per-source reading rules.
+
+[eutils]
+tool = "hpo-g14"
+max_requests_per_second = 3
+
+[orphanet_def]
+url = "https://www.orphadata.com/data/xml/en_product1.xml"
+license = "CC BY 4.0 (Orphadata Science, Orphanet)"
+definition_section_type = "16907"
+exact_relation_prefix = "E (Exact mapping"
+
+[pubmed]
+efetch_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
+batch_size = 200
+article_url = "https://pubmed.ncbi.nlm.nih.gov/{pmid}/"
+license = "PubMed abstract (NLM); copyright remains with the publisher"
+
+[genereviews]
+file_list_url = "https://ftp.ncbi.nlm.nih.gov/pub/litarch/file_list.txt"
+litarch_url = "https://ftp.ncbi.nlm.nih.gov/pub/litarch/"
+book_id = "NBK1116"
+omim_map_url = "https://ftp.ncbi.nlm.nih.gov/pub/GeneReviews/NBKid_shortname_OMIM.txt"
+titles_url = "https://ftp.ncbi.nlm.nih.gov/pub/GeneReviews/GRtitle_shortname_NBKid.txt"
+chapter_url = "https://www.ncbi.nlm.nih.gov/books/{nbk}/"
+license = "GeneReviews® © University of Washington, Seattle. Non-commercial use with credit and a link to the original, without modification"
+skip_sections = ["References", "Literature Cited", "Chapter Notes", "Author Notes", "Revision History", "Acknowledgments"]
+
+[pmc]
+fe2gen_zip = "data/raw/gvhd/Fe2Gen_Full_Collection_File01_to_File25_20261101.zip"
+europepmc_search_url = "https://www.ebi.ac.uk/europepmc/webservices/rest/search"
+s3_url = "https://pmc-oa-opendata.s3.amazonaws.com"
+article_url = "https://pmc.ncbi.nlm.nih.gov/articles/{pmcid}/"
+open_licenses = ["CC BY", "CC BY-NC", "CC BY-NC-ND"]
+image_extensions = [".jpg", ".jpeg", ".png", ".gif", ".tif", ".tiff"]
+# Section titles are matched case-insensitively. Second line: administrative sections of journal articles (T77)
+skip_sections = ["References", "Literature Cited", "Chapter Notes", "Author Notes", "Revision History", "Acknowledgments",
+                 "Author Contributions", "Funding", "Funding Information", "Conflict of Interest", "Conflict of Interest Statement",
+                 "Conflicts of Interest", "Competing Interests", "Ethics Statement", "Ethics Approval and Consent to Participate",
+                 "Data Availability Statement", "Supporting Information", "Supplementary Material"]
+
+[upload]
+license = "uploaded by user"
+dir = "data/uploads"

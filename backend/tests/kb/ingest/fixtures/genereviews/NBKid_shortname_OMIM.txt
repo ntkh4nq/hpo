@@ -1,0 +1,2 @@
+#NBK_id	GR_shortname	OMIM
+NBK1471	sca20	608687

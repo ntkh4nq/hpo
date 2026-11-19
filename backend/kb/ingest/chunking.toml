@@ -1,0 +1,23 @@
+# Chunking strategies (docs/ingestion-plan.md §5, Appendix B). `default` is chosen by E5.
+default = "s400_ctx"
+
+[s200_ctx]
+max_tokens = 200
+context_line = true
+
+[s400_ctx]
+max_tokens = 400
+context_line = true
+
+[s800_ctx]
+max_tokens = 800
+context_line = true
+
+[s400_noctx]
+max_tokens = 400
+context_line = false
+
+[parent_child]
+max_tokens = 800             # parent chunk, counted on display_text
+child_max_tokens = 150       # child chunk, counted on embed_text
+context_line = true

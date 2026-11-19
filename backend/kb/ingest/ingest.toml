@@ -1,0 +1,19 @@
+# Phase 6 ingestion settings (docs/ingestion-plan.md, Appendix B). Starting values; E5 may change some.
+scope_rule_sources = ["hpo_prenatal_branch", "hpoa_onset"]
+max_attempts = 3
+retry_delay_seconds = 60          # multiplied by the number of attempts so far
+idle_sleep_seconds = 5
+tokenizer = "data/raw/models/bge-m3/tokenizer.json"   # bge-m3 tokenizer: counts tokens when chunking (§5)
+embed_batch = 64
+embed_retry_waits = [5, 20]
+figure_model = "vlm"
+figure_timeout = 60
+visual_model = "vl-embedding"
+visual_timeout = 60
+visual_document_instruction = "Represent the user's input."
+visual_query_instruction = "Retrieve images or document pages relevant to the user's query."
+upload_max_mb = 50
+docling_images_scale = 2.0        # T76: figures cut from PDFs at twice the default resolution
+vi_char_ratio = 0.02
+literature_include_undeclared = true
+literature_max_scan_tuples = 1000000   # must exceed the total number of chunks
