@@ -1,0 +1,48 @@
+# Phase 5 (docs/agent-impl-plan.md). Each value names its source.
+
+# Case state lives in Redis this long after its last use, then Redis deletes it (T92).
+case_ttl_minutes = 1440
+
+# Max characters of a doctor message, a remap phrase, or a note. Team assumption: the longest
+# E2 description is 690 characters (evals/e2/dataset.jsonl); 4000 leaves room for long reports.
+text_max_chars = 4000
+
+# Supervisor model (T90, T93, T7c). Thinking stays off for tool turns (T22); fixed in code.
+supervisor_model = "deepseek-v4-flash"
+
+# Model calls per turn, guard rewrites included (agent-plan §6).
+max_model_calls = 10
+
+# Results of search_hpo / search_disease (agent-plan §3.4).
+search_k = 10
+
+# Max rows of any list inside one tool result (phenotypes, children, compare groups). Team assumption;
+# keeps every tool result far below deepagents' 20,000-token eviction limit.
+list_limit = 20
+
+# Characters of streamed text held back until the answer passes the guard; must exceed the longest
+# possible match of any banned pattern (agent-plan §6, T97).
+holdback_chars = 64
+
+# Source codes the guard checks (agent-plan §6). Phase 6 adds its chunk ids here.
+code_pattern = '\b(HP:\d{7}|OMIM:\d{6}|ORPHA:\d+|PMID:\d+)\b'
+
+# Phrases that turn a score or frequency into a risk (principle #2, T97). Case-insensitive, matched on NFC text.
+# Each pattern must have a bounded match length < holdback_chars.
+banned_patterns = [
+  '\d+(?:[.,]\d+)?\s*%\s*nguy cơ',
+  'nguy cơ[^.\n]{0,30}?\d+(?:[.,]\d+)?\s*%',
+  'xác suất mắc',
+  'xác suất bị',
+]
+
+# Fixed answers (T97, agent-plan §6).
+fallback_answer = "Chưa trả lời được câu này với căn cứ hiện có."
+limit_answer = "Yêu cầu này cần quá nhiều bước; bác sĩ thử hỏi gọn hơn hoặc tách thành từng câu."
+
+# citations[].kind by code prefix (agent-plan §6). Phase 6 adds its chunk prefix.
+[citation_kinds]
+HP = "hpo"
+OMIM = "disease"
+ORPHA = "disease"
+PMID = "pmid"

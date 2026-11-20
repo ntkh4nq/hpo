@@ -115,3 +115,12 @@ def test_unmentioned_skips_terms_related_to_the_query(toy):
     # D6: A (0.1, an ancestor of the query C, and rare) and B (0.8, unrelated to C)
     assert [u.hpo_id for u in unmentioned(toy, "D6", [q(C)])] == [B]
     assert unmentioned(toy, "D6", [q(B)]) == []
+
+
+def test_query_terms_finding_ids(toy):
+    terms, skipped = query_terms([finding("b nghi", B, assertion="SUSPECTED"), finding("b", B),
+                                  finding("mẹ", E, subject="MOTHER")], index=toy, ids=["f1", "f2", "f3"])
+    assert [(t.hpo_id, t.assertion, t.finding_ids) for t in terms] == [(B, "PRESENT", ["f1", "f2"])]
+    assert [(s.phrase, s.finding_id) for s in skipped] == [("mẹ", "f3")]
+    terms, skipped = query_terms([finding("b", B), finding("mẹ", E, subject="MOTHER")], index=toy)
+    assert terms[0].finding_ids == [] and skipped[0].finding_id is None

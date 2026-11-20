@@ -17,5 +17,6 @@ rank:          ; $(RUN) python -m ranking.rank $(TERMS)
 ingest-download: ; $(RUN) python -m kb.ingest.cli download $(SOURCE)
 ingest:        ; $(RUN) python -m kb.ingest.cli ingest $(SOURCE)
 ingest-worker: ; $(RUN) python -m kb.ingest.worker $(ARGS)
+e2e:           ; $(RUN) python -m scripts.e2e_case
 
-.PHONY: up down migrate seed-download seed embed api web test probe split-check analyze e2 rank ingest-download ingest ingest-worker
+.PHONY: up down migrate seed-download seed embed api web test probe split-check analyze e2 rank ingest-download ingest ingest-worker e2e

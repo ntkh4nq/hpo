@@ -1,7 +1,8 @@
 """Phase 3 graph (decisions T2, docs/mapping-plan.md §7): description -> Internal Phenotype Profile.
 
 preprocess -> split -> find_candidates (+ gate) -> choose_terms -> check_choices; when split yields no items
-(failure or nothing to report) it goes straight to check_choices. No checkpointer, no interrupt (T28).
+(failure or nothing to report) it goes straight to check_choices. Never checkpointed (`checkpointer=False`),
+no interrupt.
 
     python -m phenotype.graph "<mô tả>"       # or: make analyze TEXT="..."
 """
@@ -70,7 +71,7 @@ graph = (
     .add_edge("find_candidates", "choose_terms")
     .add_edge("choose_terms", "check_choices")
     .add_edge("check_choices", END)
-    .compile()
+    .compile(checkpointer=False)
 )
 
 

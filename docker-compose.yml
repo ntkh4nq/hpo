@@ -11,6 +11,14 @@ services:
       test: ["CMD", "pg_isready", "-U", "hpo"]
       interval: 2s
       retries: 15
+  redis:
+    image: redis:8 # có sẵn JSON + Search mà langgraph-checkpoint-redis cần
+    command: redis-server --save "" --appendonly no # state tạm của ca, không ghi ra đĩa (T92)
+    ports: ["6380:6379"] # 6379 để trống cho Redis khác trên máy
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      retries: 15
 
 volumes:
   pgdata:

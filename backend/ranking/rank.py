@@ -28,34 +28,41 @@ def common_ancestor(index: Index, codes: list[str]) -> tuple[str, float] | None:
     return None if best is None else (best, index.ic[best])
 
 
-def query_terms(findings: list[Finding], config: dict = CONFIG, index: Index | None = None
-                ) -> tuple[list[QueryTerm], list[Skipped]]:
-    """Fetal PRESENT/SUSPECTED findings that are MAPPED, or AMBIGUOUS with a specific enough common ancestor (§2)."""
+def query_terms(findings: list[Finding], config: dict = CONFIG, index: Index | None = None,
+                ids: list[str] | None = None) -> tuple[list[QueryTerm], list[Skipped]]:
+    """Fetal PRESENT/SUSPECTED findings that are MAPPED, or AMBIGUOUS with a specific enough common ancestor (§2).
+
+    `ids` (one per finding) are copied into QueryTerm.finding_ids / Skipped.finding_id (phase 5)."""
     index = index or load_index()
     terms: dict[str, QueryTerm] = {}
     skipped: list[Skipped] = []
-    for f in findings:
+    for i, f in enumerate(findings):
+        fid = ids[i] if ids else None
         code = f.term.hpo_id if f.term else None
         if f.subject != "FETUS":
-            skipped.append(Skipped(phrase=f.phrase, hpo_id=code, reason="không phải của thai"))
+            skipped.append(Skipped(phrase=f.phrase, hpo_id=code, reason="không phải của thai", finding_id=fid))
         elif f.assertion not in ("PRESENT", "SUSPECTED"):
             skipped.append(Skipped(phrase=f.phrase, hpo_id=code,
-                                   reason=f"trạng thái {f.assertion} không dùng để xếp hạng"))
+                                   reason=f"trạng thái {f.assertion} không dùng để xếp hạng", finding_id=fid))
         elif f.mapping_status == "UNMAPPED":
-            skipped.append(Skipped(phrase=f.phrase, hpo_id=None, reason="chưa ánh xạ được"))
+            skipped.append(Skipped(phrase=f.phrase, hpo_id=None, reason="chưa ánh xạ được", finding_id=fid))
         else:
             options = [o.hpo_id for o in f.options] if f.mapping_status == "AMBIGUOUS" else []
             if options:
                 found = common_ancestor(index, options)
                 if found is None or found[1] <= 0:
                     skipped.append(Skipped(phrase=f.phrase, hpo_id=None,
-                                           reason="các mã phân vân không có tổ tiên chung đủ cụ thể"))
+                                           reason="các mã phân vân không có tổ tiên chung đủ cụ thể", finding_id=fid))
                     continue
                 code = found[0]
             term = QueryTerm(hpo_id=code, assertion=f.assertion, weight=weight_of(f.assertion, config),
-                             from_options=options)
-            if code not in terms or term.weight > terms[code].weight:
+                             from_options=options, finding_ids=[fid] if fid else [])
+            if code not in terms:
                 terms[code] = term
+            else:
+                old = terms[code]
+                kept = term if term.weight > old.weight else old
+                terms[code] = kept.model_copy(update={"finding_ids": old.finding_ids + term.finding_ids})
     return list(terms.values()), skipped
 
 

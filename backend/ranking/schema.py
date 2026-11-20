@@ -17,12 +17,14 @@ class QueryTerm(BaseModel):
     assertion: QueryAssertion
     weight: float
     from_options: list[str] = []       # the AMBIGUOUS options this common ancestor stands for; empty otherwise
+    finding_ids: list[str] = []        # ids of the findings behind this code (phase 5); empty when none given
 
 
 class Skipped(BaseModel):
     phrase: str | None                 # None when the code came without a finding (rank_terms)
     hpo_id: str | None
     reason: str
+    finding_id: str | None = None      # id of the skipped finding (phase 5); None for codes skipped by rank_terms
 
 
 class Match(BaseModel):                # how one query term relates to the disease
