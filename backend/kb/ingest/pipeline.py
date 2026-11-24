@@ -12,7 +12,7 @@ from kb.ingest import chunking, figures
 from kb.ingest.config import CHUNKING, INGEST
 from kb.ingest.fetch import sha256
 from kb.ingest.model import Figure, ParsedDocument, absolute
-from kb.ingest.scope import in_scope
+from kb.ingest.scope import in_scope, known_disease_ids
 from kb.ingest.sources import SOURCES
 
 UPLOAD_FILENAME_SUFFIXES = (".pdf", ".docx")
@@ -48,11 +48,6 @@ class Work:
     vectors: dict[int, list[float]] = field(default_factory=dict)  # chunk ord -> text vector
 
 
-def resolve_strategy(name: str | None) -> str:
-    name = name or CHUNKING["default"]
-    return CHUNKING["default"] if name == "default" else name
-
-
 def release_of(raw_path: str) -> str:
     """data/raw/<source>/<release>/... -> <release>; '' for a path outside data/raw (tests)."""
     parts = raw_path.split("/")
@@ -72,10 +67,7 @@ def _retire(conn, doc_ids: list[int]) -> None:
 # ---- steps --------------------------------------------------------------------------------------
 def register(conn, w: Work) -> None:
     job = w.job
-    if job.kind == "rechunk":
-        if conn.execute("SELECT 1 FROM chunk WHERE doc_id = %s AND strategy = %s LIMIT 1",
-                        (job.doc_id, job.strategy)).fetchone():
-            raise Skipped("chunks of this strategy exist")
+    if job.kind == "rechunk":  # always rebuilds (doc, strategy); `cli rechunk` skips existing ones unless --replace
         return
     if job.doc_id is not None:  # a retry, or an upload registered by the API
         return
@@ -105,13 +97,23 @@ def register(conn, w: Work) -> None:
     job.doc_id = doc_id
 
 
-def refresh_disease_ids(conn, doc_id: int, job: Job) -> None:
-    """Same content: only recompute disease_ids, since the KB may have changed (§7)."""
+def source_disease_ids(conn, job: Job, parsed: ParsedDocument | None) -> list[str]:
+    """Codes of the document: what the source declares, or what an admin declared (declared_disease,
+    docs/evidence-plan.md §6) for sources that declare none."""
     module = SOURCES[job.source]
-    if not module.DECLARES_CODES:
-        return
-    ids = module.declared_disease_ids(module.parse(absolute(job.raw_path)), conn)
-    if not in_scope(conn, ids):
+    if module.DECLARES_CODES:
+        return module.declared_disease_ids(parsed, conn)
+    row = conn.execute("SELECT disease_ids FROM declared_disease WHERE source = %s AND source_ref = %s",
+                       (job.source, job.source_ref)).fetchone()
+    return known_disease_ids(conn, row[0]) if row else []
+
+
+def refresh_disease_ids(conn, doc_id: int, job: Job) -> None:
+    """Same content: only recompute disease_ids, since the KB (or an admin's declaration) may have changed (§7)."""
+    module = SOURCES[job.source]
+    parsed = module.parse(absolute(job.raw_path)) if module.DECLARES_CODES else None
+    ids = source_disease_ids(conn, job, parsed)
+    if module.DECLARES_CODES and not in_scope(conn, ids):
         _retire(conn, [doc_id])
     else:
         conn.execute("UPDATE document SET disease_ids = %s WHERE doc_id = %s AND disease_ids <> %s", (ids, doc_id, ids))
@@ -143,7 +145,7 @@ def ids(conn, w: Work) -> None:
         w.disease_ids = conn.execute("SELECT disease_ids FROM document WHERE doc_id = %s", (job.doc_id,)).fetchone()[0]
         return
     module = SOURCES[job.source]
-    w.disease_ids = module.declared_disease_ids(w.parsed, conn)
+    w.disease_ids = source_disease_ids(conn, job, w.parsed)
     if module.DECLARES_CODES and not in_scope(conn, w.disease_ids):
         conn.execute("DELETE FROM document WHERE doc_id = %s", (job.doc_id,))
         conn.commit()
@@ -185,7 +187,8 @@ def write(conn, w: Work) -> str:
             section_ids = [conn.execute("INSERT INTO section (doc_id, ord, heading_path) VALUES (%s, %s, %s)"
                                         " RETURNING section_id", (job.doc_id, i, s.heading_path)).fetchone()[0]
                            for i, s in enumerate(w.parsed.sections)]
-        else:
+        else:  # rechunk: replace this strategy's chunks
+            conn.execute("DELETE FROM chunk WHERE doc_id = %s AND strategy = %s", (job.doc_id, job.strategy))
             status = conn.execute("SELECT status FROM document WHERE doc_id = %s", (job.doc_id,)).fetchone()[0]
             by_ord = dict(conn.execute("SELECT ord, section_id FROM section WHERE doc_id = %s", (job.doc_id,)).fetchall())
             section_ids = [by_ord[i] for i in range(len(w.parsed.sections))]

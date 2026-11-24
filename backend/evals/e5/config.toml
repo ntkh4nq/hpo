@@ -1,0 +1,14 @@
+# E5: choose the configuration of find_passages (docs/evidence-plan.md §8, docs/evidence-impl-plan.md task 5,
+# docs/ingestion-plan.md §11). Changing how pairs are drawn or split: bump split_version and add a decisions.md row.
+
+split_version = "v1"
+pairs = 120                 # ingestion-plan §11 (T69)
+terms_per_disease = 2
+max_group_share = 0.2       # stop and report when one group holds more pairs than this share
+judge_model = "vlm"         # T7c: Qwen as judge, calibrated before use
+judge_batch = 8             # passages of one pair per judge request (T80 practice)
+judge_timeout = 60
+k = 5
+strategies = ["s200_ctx", "s400_ctx", "s800_ctx", "s400_noctx", "parent_child"]
+baseline_strategy = "s400_ctx"
+explain_pairs = 37          # median pairs per case (T81), to estimate the explanation context from tokens@5

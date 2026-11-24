@@ -76,11 +76,19 @@ def test_guard_banned_phrase():
     assert ai_texts(values) == ["Hạng 1 là bệnh có nhiều biểu hiện khớp nhất."]
 
 
-def test_guard_allows_tool_and_earlier_codes():
-    values, _, events = run(call("get_hpo", "c1", hpo_id=MICRO), AIMessage("Đầu nhỏ [HP:0000252], như đã nói [OMIM:214800]."),
+def test_guard_allows_tool_codes_of_this_turn():
+    values, _, events = run(call("get_hpo", "c1", hpo_id=MICRO), AIMessage("Đầu nhỏ [HP:0000252]."),
                             messages=[HumanMessage("CHARGE?"), AIMessage("CHARGE là [OMIM:214800]."), HumanMessage("Đầu nhỏ là gì?")])
     assert all(e["passed"] for e in events if e["type"] == "check_answer")
-    assert ai_texts(values)[-1] == "Đầu nhỏ [HP:0000252], như đã nói [OMIM:214800]."
+    assert ai_texts(values)[-1] == "Đầu nhỏ [HP:0000252]."
+
+
+def test_guard_rejects_code_only_in_an_earlier_turn():
+    """T128: the case may have changed since an earlier answer, so its codes no longer authorize a code."""
+    _, _, events = run(AIMessage("Như đã nói [OMIM:214800]."), AIMessage("Cần tra lại."),
+                       messages=[HumanMessage("CHARGE?"), AIMessage("CHARGE là [OMIM:214800]."),
+                                 HumanMessage(name="case_event", content="Ca đã đổi."), HumanMessage("Bệnh đó sao?")])
+    assert [e["passed"] for e in events if e["type"] == "check_answer"] == [False, True]
 
 
 def test_guard_rejects_code_only_typed_by_doctor():
@@ -93,3 +101,44 @@ def test_model_call_limit_raises():
     script = [call("get_hpo", f"c{i}", hpo_id=VSD) for i in range(CONFIG["max_model_calls"] + 1)]
     with pytest.raises(ModelCallLimitExceededError):
         run(*script)
+
+
+def test_guard_allows_chunk_from_tool_result(monkeypatch):
+    from agent import tools
+    from tests.agent.test_explanations import passage
+
+    monkeypatch.setattr(tools.literature, "find_passages", lambda *a, **k: [passage(42, "Coloboma is common.")])
+    values, _, events = run(call("find_passages", "c1", disease_id="OMIM:214800", topic="eye findings"),
+                            AIMessage("Tài liệu ghi coloboma thường gặp [CHUNK:42]."))
+    assert all(e["passed"] for e in events if e["type"] == "check_answer")
+    assert ai_texts(values)[-1] == "Tài liệu ghi coloboma thường gặp [CHUNK:42]."
+
+
+def test_guard_rejects_unknown_chunk():
+    _, _, events = run(AIMessage("Tài liệu ghi vậy [CHUNK:42]."), AIMessage("Cần tra tài liệu trước."))
+    assert [e["passed"] for e in events if e["type"] == "check_answer"] == [False, True]
+
+
+def test_case_prompt_ranking_in_words():
+    """The summary's data (T113, T114): matches with frequency words and their sources, no frequency codes,
+    the finding-by-disease view, shared genes by disease name, inheritance when recorded."""
+    from agent.tools import case_ranking
+    state = seed_case([row("f1", "thông liên thất", VSD), row("f2", "đầu nhỏ", MICRO)])
+    state["ranking"] = case_ranking(state).model_dump(mode="json")
+    text = render_case(state)
+    assert "khớp: " in text and "ở bệnh: " in text
+    assert "HP:00402" not in text                        # frequency terms appear only as words
+    assert "Biểu hiện của thai theo bệnh" in text
+    exact = max((sum(m["kind"] == "exact" for m in s["matches"]) for s in state["ranking"]["suggestions"]), default=0)
+    if exact:                                            # counts by kind on each disease line (T138)
+        assert f"khớp đúng khái niệm: {exact}" in text
+    for s in state["ranking"]["suggestions"]:            # a non-exact match names what the disease records (T138)
+        for m in s["matches"]:
+            if m["kind"] not in ("exact", "none", "excluded") and m.get("disease_label_en"):
+                assert f"bệnh ghi {m['disease_label_en']})" in text
+    refs = {r for s in state["ranking"]["suggestions"] for m in s["matches"] for rs in m["references"] for r in rs}
+    assert not refs or any(r in text for r in refs)      # each frequency names its source
+    if any(s["inheritance"] for s in state["ranking"]["suggestions"]):
+        assert "kiểu di truyền ghi nhận: " in text
+    shared = [g for g in state["ranking"]["genes"] if len(g["disease_ids"]) > 1]
+    assert not shared or "Gene gắn với nhiều gợi ý" in text

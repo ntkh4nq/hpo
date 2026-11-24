@@ -13,7 +13,7 @@ import pytest
 
 from core.db import connect
 from kb.ingest import figures, pipeline, worker
-from kb.ingest.config import INGEST
+from kb.ingest.config import INGEST, resolve_strategy
 from kb.ingest.model import REPO_ROOT, rel
 
 FIX = Path(__file__).parent / "fixtures"
@@ -76,7 +76,7 @@ class Env:
             for source, ref, path in jobs:
                 conn.execute("INSERT INTO ingest_job (run_id, kind, source, source_ref, raw_path, strategy, doc_id)"
                              " VALUES (%s, %s, %s, %s, %s, %s, %s)",
-                             (run_id, kind, source, ref, path, pipeline.resolve_strategy(strategy), doc_id))
+                             (run_id, kind, source, ref, path, resolve_strategy(strategy), doc_id))
         self.runs.append(run_id)
         worker.work(once=True, run_id=run_id)
         return run_id
@@ -96,6 +96,7 @@ class Env:
     def cleanup(self) -> None:
         with connect() as conn:
             conn.execute("DELETE FROM document WHERE source_ref LIKE 'TEST:%%'")
+            conn.execute("DELETE FROM declared_disease WHERE source_ref LIKE 'TEST:%%'")
             conn.execute("DELETE FROM ingest_job WHERE run_id = ANY(%s)", (self.runs,))
             conn.execute("DELETE FROM ingest_run WHERE run_id = ANY(%s)", (self.runs,))
         for d in self.dirs:

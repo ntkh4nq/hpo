@@ -14,7 +14,7 @@ from pathlib import Path
 from core.db import connect
 from kb.search.hpo import search_hpo
 from core.llm import invoke_json
-from phenotype.schema import Analysis, Candidate, ChoiceSet, Finding, Item, Rejection, Term
+from phenotype.schema import Analysis, Candidate, ChoiceSet, Finding, Item, Measurement, Rejection, Term
 from phenotype.split import locate
 
 HERE = Path(__file__).parent
@@ -25,10 +25,26 @@ PROMPT_VERSION = hashlib.sha256(PROMPT.encode()).hexdigest()[:12]
 
 # ---------- step 3: candidates and gate
 
+def verbatim(m: Measurement | None, source_text: str) -> bool:
+    """Both parts of the measurement occur word for word in the item's source sentence (principle #8)."""
+    return m is not None and bool(m.quantity.strip()) and m.quantity in source_text and m.value in source_text
+
+
+def awaits_doctor(item: Item) -> bool:
+    """A measurement nobody concluded on (T117, T118): the doctor decides, so no model reads the number. Its candidates
+    come from the measured quantity in the doctor's words, and it is not sent to the choose step."""
+    return item.assertion == "UNCERTAIN" and verbatim(item.measurement, item.source_text)
+
+
+def query_of(item: Item) -> str:
+    """Bare quantity names retrieve the concepts a doctor would pick; "bất thường" + quantity mostly does not (T118)."""
+    return item.measurement.quantity if awaits_doctor(item) else item.phrase
+
+
 def find_candidates(items: list[Item]) -> dict[int, list[Candidate]]:
     """item index -> its search_hpo results (default profile), with definition and reviewed-name flag from the KB."""
     with ThreadPoolExecutor(CONFIG["search_concurrency"]) as pool:
-        found = list(pool.map(lambda item: search_hpo(item.phrase, k=CONFIG["candidates_k"]), items))
+        found = list(pool.map(lambda item: search_hpo(query_of(item), k=CONFIG["candidates_k"]), items))
     ids = sorted({c["hpo_id"] for results in found for c in results})
     with connect() as conn:
         extra = {h: (d, r) for h, d, r in conn.execute(
@@ -49,6 +65,11 @@ def best_dense(candidates: list[Candidate]) -> float:
 def gate(candidates: dict[int, list[Candidate]], threshold: float) -> set[int]:
     """Items whose best dense score is below the threshold: UNMAPPED without asking the model."""
     return {i for i, cands in candidates.items() if best_dense(cands) < threshold}
+
+
+def not_chosen(items: list[Item], candidates: dict[int, list[Candidate]], threshold: float) -> set[int]:
+    """Items the choose step does not see: gated ones and measurements awaiting the doctor (UNMAPPED, candidates kept)."""
+    return gate(candidates, threshold) | {i for i, item in enumerate(items) if awaits_doctor(item)}
 
 
 # ---------- step 4: choose
@@ -95,8 +116,7 @@ def _current_terms(ids: set[str]) -> set[str]:
 
 
 def _term(c: Candidate) -> Term:
-    return Term(hpo_id=c.hpo_id, label_en=c.label_en, label_vi=c.label_vi,
-                label_vi_reviewed=c.label_vi_reviewed, definition_en=c.definition_en)
+    return Term(hpo_id=c.hpo_id, label_en=c.label_en, definition_en=c.definition_en)
 
 
 def check_choices(text: str, items: list[Item], candidates: dict[int, list[Candidate]], gated: set[int],
@@ -143,10 +163,13 @@ def check_choices(text: str, items: list[Item], candidates: dict[int, list[Candi
                 status, options = "AMBIGUOUS", [_term(k) for k in kept]
             else:
                 rejections.append(Rejection(index=i, reason=f"AMBIGUOUS left with {len(kept)} valid options"))
+        measurement = item.measurement if verbatim(item.measurement, item.source_text) else None
+        if item.measurement and measurement is None:
+            rejections.append(Rejection(index=i, reason="measurement not verbatim in source_text"))
         findings.append(Finding(
             phrase=item.phrase, source_text=item.source_text, source_span=locate(text, item.source_text),
             assertion=item.assertion, assessment=item.assessment, temporality=item.temporality,
-            subject=item.subject, mapping_status=status, term=term, options=options,
+            subject=item.subject, measurement=measurement, mapping_status=status, term=term, options=options,
             candidates=candidates.get(i, []),
         ))
     return Analysis(text=text, hpo_release=hpo_release(), findings=findings, split_failed=split_failed,

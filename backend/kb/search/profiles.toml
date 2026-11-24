@@ -5,6 +5,11 @@
 
 hpo_default = "hpo_rrf_prior"  # chosen by E1 2026-11-10 (decisions T24); profile search_hpo uses when none is given
 hpo_vi_label_sources = ["doctor", "claude", "chatgpt"]  # which Vietnamese name to show, first found wins
+literature_profile = "doc_rrf_lexical"   # profile of find_passages (docs/evidence-plan.md §3); E5-dev chose it (T83)
+literature_query_kinds = ["label"]       # hpo_name.kind values that build the query of a pair; E5-dev kept it over ["label", "exact_syn"] (T83)
+# Every dense/visual leg: an HNSW iterative scan stops after this many tuples; must exceed the number of chunks
+# (60,409 on 2026-11-21). T80: equal to an exact scan.
+hnsw_max_scan_tuples = 1000000
 
 [hpo_dense]
 legs.dense = { depth = 100 }
@@ -43,3 +48,29 @@ legs.trigram = { depth = 100, weight = 1.0, function = "word_similarity", thresh
 rrf_k = 60
 prior = { hpo_prenatal_branch = 0.3, hpoa_onset = 0.3, g14_assumption = 0.1 }
 rerank = { method = "colbert", top = 20 }
+
+# Literature passages (docs/evidence-plan.md §3). Corpus DOC_CHUNKS in kb/search/literature.py.
+[doc_rrf]
+legs.dense = { depth = 50, weight = 1.0 }
+legs.fulltext = { depth = 50, weight = 1.0 }
+rrf_k = 60
+
+[doc_rrf_lexical]
+legs.dense = { depth = 50, weight = 1.0 }
+legs.fulltext = { depth = 50, weight = 1.0 }
+rrf_k = 60
+require_leg = "fulltext"     # T81: keeps 71/73 supporting passages, drops 73% of the others
+
+[doc_rrf_lexical_visual]
+legs.dense = { depth = 50, weight = 1.0 }
+legs.fulltext = { depth = 50, weight = 1.0 }
+legs.visual = { depth = 20, weight = 1.0 }
+rrf_k = 60
+require_leg = "fulltext"
+
+[doc_rrf_lexical_colbert]
+legs.dense = { depth = 50, weight = 1.0 }
+legs.fulltext = { depth = 50, weight = 1.0 }
+rrf_k = 60
+require_leg = "fulltext"
+rerank = { method = "colbert", top = 30 }

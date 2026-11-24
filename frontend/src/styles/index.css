@@ -1,0 +1,14 @@
+/* Stylesheet entry: tokens → primitives → shell → features. One rule per element, no override layers. */
+@import '@fontsource-variable/inter';
+@import './tokens.css';
+@import './base.css';
+@import '../app/styles/app.css';
+@import '../features/navigation/styles/navigation.css';
+@import '../features/clinical-input/styles/clinical-input.css';
+@import '../features/phenotype/styles/phenotype.css';
+@import '../features/results/styles/results.css';
+@import '../features/chat/styles/chat.css';
+@import '../features/history/styles/history.css';
+@import '../features/profile/styles/profile.css';
+@import '../features/evidence/styles/evidence.css';
+@import '../features/progress/styles/progress.css';

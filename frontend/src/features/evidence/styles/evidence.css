@@ -1,0 +1,40 @@
+/* Evidence dialog body (the dialog chrome is the shared Dialog) */
+.evidence-meta-row,
+.evidence-excerpt-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.field-tag {
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.evidence-location-text {
+  font-size: 14px;
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+}
+
+.evidence-excerpt-quote {
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-secondary);
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-style: italic;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.source-origin {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  width: fit-content;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--info);
+}

@@ -42,19 +42,34 @@ def parse_json(text: str, schema: type[BaseModel]) -> BaseModel:
 
 
 def invoke_json(system: str, human: str, schema: type[BaseModel], *, thinking: bool,
-                timeout: float, model: str | None = None) -> BaseModel | None:
-    """One request (plus one retry) returning `schema`, or None when both attempts failed."""
+                timeout: float, model: str | None = None, usage: dict | None = None) -> BaseModel | None:
+    """One request (plus one retry) returning `schema`, or None when both attempts failed.
+
+    `usage`, when given, accumulates {"requests", "input_tokens", "output_tokens"} over the attempts made.
+    """
     if thinking:
         llm = chat(model, thinking=True, timeout=timeout)
         system += JSON_INSTRUCTION + json.dumps(schema.model_json_schema(), ensure_ascii=False)
     else:
-        llm = chat(model, timeout=timeout).with_structured_output(schema, method="function_calling")
+        # include_raw: the reply's token usage; a schema error comes back as parsing_error instead of raising (T82)
+        llm = chat(model, timeout=timeout).with_structured_output(schema, method="function_calling", include_raw=True)
     messages = [("system", system), ("human", human)]
     for _ in range(ATTEMPTS):
+        if usage is not None:
+            usage["requests"] = usage.get("requests", 0) + 1
         try:
             out = llm.invoke(messages, config={"callbacks": [CallbackHandler()]})
+            message = out if thinking else out["raw"]
+            if usage is not None:
+                meta = getattr(message, "usage_metadata", None) or {}
+                for k in ("input_tokens", "output_tokens"):
+                    usage[k] = usage.get(k, 0) + meta.get(k, 0)
             if thinking:
                 out = parse_json(out.content, schema)
+            else:
+                if out["parsing_error"] is not None:
+                    continue
+                out = out["parsed"]
         except Exception:  # noqa: BLE001 - timeout, gateway error, schema validation: all count as a failed attempt
             continue
         if out is not None:

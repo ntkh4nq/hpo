@@ -1,0 +1,33 @@
+/* Progress list of a streamed turn (T96): one row per step, ✓ in place, children indented. Tokens only. */
+.turn-progress {
+  list-style: none; margin: 0 0 12px; padding: 0;
+  display: grid; gap: 6px;
+}
+.turn-progress--children { margin: 6px 0 0; padding-left: 20px; }
+.turn-progress__row {
+  display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 8px;
+  color: var(--text-secondary); font-size: 14px; line-height: 1.45;
+}
+.turn-progress__marker {
+  flex: none; display: inline-flex; align-items: center; justify-content: center;
+  width: 16px; height: 16px; align-self: center; color: var(--text-muted);
+}
+.turn-progress__step[data-state="done"] > .turn-progress__row .turn-progress__marker { color: var(--primary); }
+.turn-progress__step[data-state="error"] > .turn-progress__row .turn-progress__marker { color: var(--rose); }
+.turn-progress__step[data-state="running"] > .turn-progress__row .turn-progress__label { color: var(--text-primary); }
+.turn-progress__label { min-width: 0; overflow-wrap: anywhere; }
+.turn-progress__text {
+  margin: 4px 0 0; overflow-wrap: anywhere;
+  color: var(--text-primary); font-size: 15px; line-height: 1.6;
+}
+.turn-progress__step, .turn-progress__item { min-width: 0; }
+.turn-progress__summary { overflow-wrap: anywhere; }
+.turn-progress__toggle {
+  display: inline-flex; align-items: center; gap: 4px; align-self: center;
+  padding: 0 6px; border: 0; border-radius: var(--radius-xs); background: transparent;
+  color: var(--text-muted); font-size: 12px; cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+.turn-progress__toggle:hover { background: var(--surface-hover); color: var(--text-secondary); }
+.turn-progress__toggle svg { transition: transform var(--transition-fast); }
+.turn-progress__toggle[aria-expanded="true"] svg { transform: rotate(90deg); }

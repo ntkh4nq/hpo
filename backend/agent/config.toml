@@ -1,7 +1,8 @@
 # Phase 5 (docs/agent-impl-plan.md). Each value names its source.
 
-# Case state lives in Redis this long after its last use, then Redis deletes it (T92).
-case_ttl_minutes = 1440
+# Characters of a case title: the default title (first line of the first message) and the doctor's rename (T116).
+# Team assumption: one line of the case list in the sidebar.
+case_title_chars = 60
 
 # Max characters of a doctor message, a remap phrase, or a note. Team assumption: the longest
 # E2 description is 690 characters (evals/e2/dataset.jsonl); 4000 leaves room for long reports.
@@ -24,8 +25,8 @@ list_limit = 20
 # possible match of any banned pattern (agent-plan §6, T97).
 holdback_chars = 64
 
-# Source codes the guard checks (agent-plan §6). Phase 6 adds its chunk ids here.
-code_pattern = '\b(HP:\d{7}|OMIM:\d{6}|ORPHA:\d+|PMID:\d+)\b'
+# Source codes the guard checks (agent-plan §6). CHUNK = a passage of KB layer 3 (evidence-plan §5).
+code_pattern = '\b(HP:\d{7}|OMIM:\d{6}|ORPHA:\d+|PMID:\d+|CHUNK:\d+)\b'
 
 # Phrases that turn a score or frequency into a risk (principle #2, T97). Case-insensitive, matched on NFC text.
 # Each pattern must have a bounded match length < holdback_chars.
@@ -40,9 +41,83 @@ banned_patterns = [
 fallback_answer = "Chưa trả lời được câu này với căn cứ hiện có."
 limit_answer = "Yêu cầu này cần quá nhiều bước; bác sĩ thử hỏi gọn hơn hoặc tách thành từng câu."
 
-# citations[].kind by code prefix (agent-plan §6). Phase 6 adds its chunk prefix.
+# Words the case summary uses for a raw hpoa frequency and a match kind, so the supervisor never sees (or repeats)
+# a frequency code. Labels follow the HPO frequency terms (HP:0040279 subtree) and the UI's vi.json (T113).
+[case.frequency_words]
+"HP:0040280" = "luôn có, 100%"
+"HP:0040281" = "rất thường gặp, 80–99%"
+"HP:0040282" = "thường gặp, 30–79%"
+"HP:0040283" = "thỉnh thoảng, 5–29%"
+"HP:0040284" = "rất hiếm, 1–4%"
+"HP:0040285" = "không có, 0%"
+
+[case.source_names]   # reference prefix -> the name the summary uses for that database (T114)
+OMIM = "OMIM"
+ORPHA = "Orphanet"
+DECIPHER = "DECIPHER"
+
+[case.match_words]
+exact = "khớp đúng khái niệm"
+disease_more_specific = "bệnh ghi nhận dạng cụ thể hơn"
+disease_more_general = "bệnh ghi nhận dạng tổng quát hơn"
+related = "khớp gần, cùng nhóm biểu hiện"
+
+# Notices written into the conversation when the case changes outside it (T128): after a card edit re-ranks
+# (a human-role message named "case_event"), and appended to analyze_findings' result after a new analysis.
+[case.events]
+findings_edited = "Thông báo của hệ thống (không phải lời bác sĩ): bác sĩ vừa sửa biểu hiện trên thẻ và ca đã được xếp hạng lại. Danh sách bệnh, số đếm và tóm tắt trong các tin nhắn trước có thể không còn đúng; chỉ mục 'Ca hiện tại' là trạng thái hiện tại."
+new_analysis = "Mô tả mới đã thay toàn bộ biểu hiện cũ: biểu hiện, danh sách bệnh, số đếm và tóm tắt trong các tin nhắn trước không còn đúng; chỉ mục 'Ca hiện tại' là trạng thái hiện tại."
+
+# Words for whether a disease is on the list the doctor sees now (tools get_disease, explain_disease, compare_diseases).
+[case.list_words]
+listed = "có trong danh sách gợi ý hiện tại"
+not_listed = "không có trong danh sách gợi ý hiện tại"
+
+# Words for the state codes of a finding, so the case summary never shows a code and never prints a finding's
+# phrase without its state (T129). They match the UI labels in frontend/src/i18n/locales/vi.json
+# (assertion.*, assessment.*, subject.*, skipReason.*).
+[case.assertion_words]
+PRESENT = "có biểu hiện"
+ABSENT = "không có biểu hiện"
+SUSPECTED = "nghi ngờ có biểu hiện"
+UNCERTAIN = "chưa xác định"
+
+[case.assessment_words]
+ASSESSED = "đã đánh giá"
+LIMITED = "đánh giá hạn chế"
+NOT_ASSESSED = "chưa đánh giá"
+NOT_ASSESSABLE = "không thể đánh giá"
+
+[case.subject_words]
+FETUS = "của thai"
+MOTHER = "bệnh lý của mẹ"
+FAMILY = "tiền sử gia đình"
+
+[case.skip_words]   # ranking.schema.SKIP_REASONS
+not_fetal = "không phải biểu hiện của thai"
+state_not_used = "trạng thái này không dùng để tìm bệnh"
+absent_checked = "thai không có: chỉ dùng để đối chiếu với các bệnh"
+unmapped = "chưa tìm được thuật ngữ HPO"
+ambiguous_no_common_ancestor = "chưa rõ thuật ngữ HPO"
+not_in_kb = "mã không còn trong dữ liệu HPO"
+excluded_by_doctor = "bác sĩ đã bỏ khỏi tìm kiếm"
+
+# citations[].kind by code prefix (agent-plan §6).
 [citation_kinds]
 HP = "hpo"
 OMIM = "disease"
 ORPHA = "disease"
 PMID = "pmid"
+CHUNK = "chunk"
+
+# Explanations of the suggestions (docs/evidence-plan.md §4, docs/evidence-impl-plan.md task 3).
+[explain]
+model = "deepseek-v4-flash"     # T7c: main model
+passages_per_pair = 5
+max_context_tokens = 40000      # team assumption: twice the measured 14–21 thousand at s400_ctx (T81); caps cost if E5 picks longer chunks
+timeout = 120
+# Match kinds whose disease term gets passages (evidence-plan §4.2 step 1); "excluded" and "none" never do.
+cited_kinds = ["exact", "disease_more_specific", "disease_more_general", "related"]
+# Document sources that describe a whole disease (a definition): shown once as the disease overview, never sent as
+# evidence of one finding — a one-sentence definition passed the any-word fulltext gate for most findings (T110).
+overview_sources = ["orphanet_def"]

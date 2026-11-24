@@ -1,0 +1,9 @@
+{
+  "_comment": "Public page of an identifier, by prefix (T114). {id} is the part after the colon. A prefix not listed here is shown as plain text.",
+  "HP": "https://hpo.jax.org/browse/term/HP:{id}",
+  "OMIM": "https://omim.org/entry/{id}",
+  "ORPHA": "https://www.orpha.net/en/disease/detail/{id}",
+  "DECIPHER": "https://www.deciphergenomics.org/syndrome/{id}",
+  "PMID": "https://pubmed.ncbi.nlm.nih.gov/{id}/",
+  "NCBIGene": "https://www.ncbi.nlm.nih.gov/gene/{id}"
+}

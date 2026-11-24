@@ -17,7 +17,7 @@ HERE = Path(__file__).parent
 DATASET = HERE / "dataset.jsonl"
 PROMPTS = [HERE.parents[1] / "phenotype" / "prompts" / f for f in ("split.md", "choose_term.md")]
 N_CASES = 40
-ITEMS_PER_CASE = (3, 12)
+ITEMS_PER_CASE = (3, 12)   # items written from the disease (e2-plan §5.1); measurements awaiting the doctor (T119) not counted
 MIN_FROM_DISEASE = 3
 KINDS = {  # e2-plan §4.3: kind of item -> (minimum number of cases containing it, test)
     "any item not PRESENT": (40, lambda i: i["assertion"] != "PRESENT"),
@@ -67,8 +67,9 @@ def check(cases: list[dict]) -> list[str]:
 
     for c in cases:
         cid, items = c["id"], c["items"]
-        if not ITEMS_PER_CASE[0] <= len(items) <= ITEMS_PER_CASE[1]:
-            errors.append(f"{cid}: {len(items)} items, expected {ITEMS_PER_CASE[0]}-{ITEMS_PER_CASE[1]}")
+        written = [i for i in items if not (i.get("measurement") and i["assertion"] == "UNCERTAIN" and i["hpo_id"] is None)]
+        if not ITEMS_PER_CASE[0] <= len(written) <= ITEMS_PER_CASE[1]:
+            errors.append(f"{cid}: {len(written)} items, expected {ITEMS_PER_CASE[0]}-{ITEMS_PER_CASE[1]}")
         for i in items:
             label = f"{cid} '{i['phrase']}'"
             errors += [f"{label}: {f} = {i[f]!r}" for f, allowed in enums.items() if i[f] not in allowed]

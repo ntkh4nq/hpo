@@ -44,3 +44,43 @@ def test_search_hpo_finds_vsd():
     top = search_hpo("thông liên thất", k=5)
     assert top[0]["hpo_id"] == "HP:0001629"
     assert top[0]["label_vi"]
+
+
+def test_load_profile_accepts_new_legs_and_require_leg():
+    for name in ("doc_rrf", "doc_rrf_lexical", "doc_rrf_lexical_visual", "doc_rrf_lexical_colbert"):
+        load_profile(name)
+
+
+def test_load_profile_rejects_unknown_leg_and_foreign_require_leg(monkeypatch):
+    monkeypatch.setitem(PROFILES, "bad_leg", {"legs": {"bogus": {"depth": 5}}})
+    monkeypatch.setitem(PROFILES, "bad_req", {"legs": {"dense": {"depth": 5}, "fulltext": {"depth": 5}},
+                                              "require_leg": "trigram"})
+    for name in ("bad_leg", "bad_req"):
+        with pytest.raises(ValueError):
+            load_profile(name)
+
+
+def test_corpus_without_column_raises(monkeypatch):
+    from kb.search import engine
+
+    monkeypatch.setattr(engine, "connect", lambda *a, **k: pytest.fail("connected"))
+    corpus = engine.Corpus(name="no_tsv", source="t", key="k", text="x", embedding="e")
+    with pytest.raises(ValueError, match="tsv"):
+        engine.retrieve(corpus, "q", "doc_rrf")
+
+
+class _StubConn:
+    def cursor(self):
+        import contextlib
+        return contextlib.nullcontext(None)
+
+
+def test_require_leg_filters_after_fuse(monkeypatch):
+    from kb.search import engine
+
+    monkeypatch.setitem(engine.LEG_FUNCTIONS, "dense", lambda *a: [("A", "a", 0.9), ("B", "b", 0.8)])
+    monkeypatch.setitem(engine.LEG_FUNCTIONS, "fulltext", lambda *a: [("B", "b", 0.5)])
+    corpus = engine.Corpus(name="stub", source="t", key="k", text="x", embedding="e", tsv="t")
+    lexical = engine.retrieve(corpus, "q", "doc_rrf_lexical", conn=_StubConn())
+    plain = engine.retrieve(corpus, "q", "doc_rrf", conn=_StubConn())
+    assert [c.key for c in lexical] == ["B"] and {c.key for c in plain} == {"A", "B"}

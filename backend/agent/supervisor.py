@@ -17,8 +17,8 @@ from core.llm import chat
 PROMPTS = Path(__file__).with_name("prompts")
 SUPERVISOR_PROMPT = (PROMPTS / "supervisor.md").read_text(encoding="utf-8")
 TODOS_PROMPT = (PROMPTS / "todos.md").read_text(encoding="utf-8")
-TOOLS = [analyze_findings, *CODE_TOOLS]   # phase 6 appends write_explanations here
-SUBAGENTS: list = []                      # phase 6 adds `literature` here (the `task` tool then appears)
+TOOLS = [analyze_findings, *CODE_TOOLS]
+SUBAGENTS: list = []                      # none: explanations come from POST /cases/{id}/explanations (T81)
 
 # No file tools (every tool result is bounded by list_limit) and no general-purpose subagent, hence no `task`.
 # A pre-built ChatOpenAI resolves its profile by "<ls_provider>:<model name>" (T98 (4)).

@@ -1,0 +1,1 @@
+export { ClinicalInput } from './ClinicalInput';

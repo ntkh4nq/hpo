@@ -2,10 +2,11 @@ import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
-from langgraph.checkpoint.redis.aio import AsyncRedisSaver
+from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
+from psycopg.rows import dict_row
+from psycopg_pool import AsyncConnectionPool
 
 from agent.graph import build_graph
-from agent.state import CONFIG
 from api.cases import router as cases_router
 from api.documents import router as documents_router
 from core.db import connect
@@ -14,9 +15,12 @@ from ranking.index import load_index
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Case graph on the Redis checkpointer (T92); entering the saver runs its setup (T98)."""
-    ttl = {"default_ttl": CONFIG["case_ttl_minutes"], "refresh_on_read": True}
-    async with AsyncRedisSaver.from_conn_string(os.environ["REDIS_URL"], ttl=ttl) as saver:
+    """Case graph on the Postgres checkpointer: cases stay until the doctor deletes them (T116). `setup()` creates
+    the checkpointer's own tables; the case list and turn record are in db/migrations/0005_cases.sql."""
+    kwargs = {"autocommit": True, "prepare_threshold": 0, "row_factory": dict_row}   # what the saver requires
+    async with AsyncConnectionPool(os.environ["DATABASE_URL"], kwargs=kwargs, open=False) as pool:
+        saver = AsyncPostgresSaver(pool)
+        await saver.setup()
         load_index()   # warm the ranking index (about 4 s, T51) before the first request
         app.state.graph = build_graph(saver)
         yield

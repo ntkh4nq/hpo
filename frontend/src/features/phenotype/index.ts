@@ -1,0 +1,1 @@
+export { PhenotypeReview } from './PhenotypeReview';

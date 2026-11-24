@@ -148,7 +148,10 @@ def test_figures_and_rechunk(env, fake_models):
     assert {c["section_id"] for c in pc} <= {c["section_id"] for c in chunks}  # sections reused
     again = env.run([("genereviews", "TEST:sca20", chapter)], kind="rechunk", strategy="parent_child",
                     doc_id=doc["doc_id"])
-    assert [j["state"] for j in env.jobs(again)] == ["skipped"]
+    assert [j["state"] for j in env.jobs(again)] == ["done"]  # a rechunk job replaces that strategy's chunks
+    pc2 = [c for c in chunks_of(doc["doc_id"]) if c["strategy"] == "parent_child"]
+    assert len(pc2) == len(pc) and not {c["chunk_id"] for c in pc2} & {c["chunk_id"] for c in pc}
+    assert len({c["ord"] for c in pc2}) == len(pc2)
 
 
 def test_figure_cache(monkeypatch):
@@ -172,3 +175,37 @@ def test_figure_cache(monkeypatch):
             conn.execute("DELETE FROM figure_description WHERE image_sha256 = %s", (sha256(path),))
             conn.execute("DELETE FROM figure_embedding WHERE image_sha256 = %s", (sha256(path),))
         path.unlink()
+
+
+def declare(ref: str, codes: list[str]) -> None:
+    with connect() as conn:
+        conn.execute("""INSERT INTO declared_disease (source, source_ref, disease_ids) VALUES ('upload', %s, %s)
+                        ON CONFLICT (source, source_ref) DO UPDATE SET disease_ids = EXCLUDED.disease_ids""",
+                     (ref, codes))
+
+
+def test_declared_codes_reach_chunks_and_new_version_keeps_them(env, fake_models):
+    """Codes an admin declared (declared_disease) are read like a source's own codes (evidence-plan §6)."""
+    declare("TEST:up1", ["OMIM:163950"])
+    env.run([("upload", "TEST:up1", env.copy("upload/guide_en.pdf"))])
+    (v1,) = env.documents("TEST:up1")
+    chunks = chunks_of(v1["doc_id"])
+    assert v1["disease_ids"] == ["OMIM:163950"] and all(c["disease_ids"] == ["OMIM:163950"] for c in chunks)
+    assert all("Diseases: Noonan syndrome 1" in c["embed_text"] for c in chunks if c["embed_text"])
+
+    other = env.copy("upload/guide_vi.docx")
+    env.run([("upload", "TEST:up1", other)])  # same source document, new content -> version 2
+    v1, v2 = env.documents("TEST:up1")
+    assert v2["version"] == 2 and v2["disease_ids"] == ["OMIM:163950"]
+
+    declare("TEST:up1", ["ORPHA:648"])  # same content again: codes refreshed from the table
+    run_id = env.run([("upload", "TEST:up1", other)])
+    assert [j["state"] for j in env.jobs(run_id)] == ["skipped"]
+    assert env.documents("TEST:up1")[1]["disease_ids"] == ["ORPHA:648"]
+    assert {tuple(c["disease_ids"]) for c in chunks_of(v2["doc_id"])} == {("ORPHA:648",)}
+
+
+def test_undeclared_document_has_no_codes_and_is_kept(env, fake_models):
+    env.run([("upload", "TEST:up2", env.copy("upload/guide_en.pdf"))])
+    (doc,) = env.documents("TEST:up2")
+    assert doc["disease_ids"] == [] and doc["status"] == "PENDING"

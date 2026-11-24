@@ -173,3 +173,66 @@ def test_check_edits_after_remap_uses_new_candidates():
                 "term": as_term(CANDIDATES["đầu nhỏ"][0]), "candidates": [x.model_dump() for x in CANDIDATES["đầu nhỏ"]]}
     vs = effective_findings(case_state(remaps={"f3": remapped}))
     check_edits(vs, [FindingEdit(finding_id="f3", hpo_id=VSD)], {})
+
+
+# ---------- carry-over of the doctor's corrections on re-analysis (T132)
+
+def test_reanalysis_keeps_remap_edit_and_note(phase3):
+    """Second description with the same sentences: the review already shows the doctor's corrections."""
+    agent = make_agent(AIMessage("xong"), call("analyze_findings", "c2"), AIMessage("xong"))
+    run(agent, {"messages": [HumanMessage("mô tả")]})
+    resume(agent, action="remap", finding_id="f3", phrase="đầu nhỏ")
+    resume(agent, action="continue", edits=[FindingEdit(finding_id="f1", assertion="SUSPECTED")], notes={"f2": "đo lại"})
+    run(agent, {"messages": [HumanMessage("mô tả, thêm một câu")]})
+    value = pending(agent)
+    by_id = {f["finding_id"]: f for f in value["findings"]}
+    assert by_id["f1"]["assertion"] == "SUSPECTED" and by_id["f1"]["machine"] == {"assertion": "PRESENT"}
+    assert by_id["f2"]["note"] == "đo lại"
+    assert by_id["f3"]["phrase"] == "đầu nhỏ" and by_id["f3"]["term"]["hpo_id"] == MICRO
+    assert value["carry_over"] == {"applied": 3, "not_applied": 0}
+    resume(agent, action="continue", edits=[FindingEdit(finding_id="f1", assertion="SUSPECTED")], notes={"f2": "đo lại"})
+    assert agent.get_state(CFG).values.get("notes_archive") in (None, [])   # carried notes are not archived
+
+
+def test_chat_message_is_added_to_the_description(phase3):
+    """'The fetus also has X' in the chat keeps the earlier description; the review shows what was read (T137)."""
+    agent = make_agent(AIMessage("xong"), call("analyze_findings", "c2"), AIMessage("xong"))
+    run(agent, {"messages": [HumanMessage("mô tả")]})
+    resume(agent, action="continue")
+    run(agent, {"messages": [HumanMessage("thai có thêm dư ối")]})
+    assert phase3.split_texts[-1] == "mô tả\nthai có thêm dư ối"
+    assert pending(agent)["description"] == "mô tả\nthai có thêm dư ối"
+    resume(agent, action="continue")
+    assert agent.get_state(CFG).values["description"] == "mô tả\nthai có thêm dư ối"
+
+
+def test_description_box_replaces_the_description(phase3):
+    agent = make_agent(AIMessage("xong"), call("analyze_findings", "c2"), AIMessage("xong"))
+    run(agent, {"messages": [HumanMessage("mô tả")]})
+    resume(agent, action="continue")
+    run(agent, {"messages": [HumanMessage("mô tả đã sửa", additional_kwargs={"whole_description": True})]})
+    assert phase3.split_texts[-1] == "mô tả đã sửa"
+
+
+def _row(fid, sentence, phrase, code=None):
+    return {"finding_id": fid, "source_text": sentence, "source_span": None, "phrase": phrase,
+            "term": {"hpo_id": code} if code else None, "candidates": [{"hpo_id": code}] if code else []}
+
+
+def test_carry_over_matches_by_phrase_then_by_term_and_skips_ambiguous_keys():
+    from agent.analysis import carry_over
+    old = [_row("f1", "Thai có  Thông liên thất.", "thông liên thất", VSD),
+           _row("f2", "Dư ối.", "dư ối", POLY),
+           _row("f3", "Hai khối lạ.", "khối lạ"), _row("f4", "Hai khối lạ.", "khối lạ"),
+           _row("f5", "Câu đã bị xoá.", "x", MICRO)]
+    new = [_row("f1", "thai có thông liên thất.", "Thông liên thất", VSD),     # same sentence + phrase (case, spaces)
+           _row("f2", "Dư ối.", "đa ối", POLY),                                # phrase reworded, same machine term
+           _row("f3", "Hai khối lạ.", "khối lạ")]                              # two old findings share the key
+    previous = {"findings": old, "remaps": {}, "notes": {"f3": "n3", "f5": "n5"},
+                "edits": {"f1": {"finding_id": "f1", "assertion": "SUSPECTED"},
+                          "f2": {"finding_id": "f2", "excluded": True, "hpo_id": OLIGO}}}
+    out = carry_over({"findings": new, "previous": previous})
+    assert out["edits"] == {"f1": {"finding_id": "f1", "assertion": "SUSPECTED"},
+                            "f2": {"finding_id": "f2", "excluded": True}}   # OLIGO is not a candidate of the new f2
+    assert out["notes"] == {}
+    assert out["carry_over"] == {"applied": 2, "not_applied": 2, "carried": ["f1", "f2"]}

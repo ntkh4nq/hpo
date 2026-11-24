@@ -11,7 +11,7 @@ from langfuse import get_client
 from evals.e2.check import load_cases
 
 DATASET = "e2-description-to-profile"
-SPLIT_VERSION = "v1"  # bump (and add a decisions.md row) whenever a case of e2.jsonl changes (T45)
+SPLIT_VERSION = "v2"   # v2: measurements added (T119)  # bump (and add a decisions.md row) whenever a case of e2.jsonl changes (T45)
 DATASET_DESCRIPTION = "Vietnamese prenatal description -> gold items (phrase, status, subject, HPO code). Test only."
 
 

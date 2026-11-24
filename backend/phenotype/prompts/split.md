@@ -8,8 +8,9 @@ Bạn đọc mô tả khám thai (siêu âm, MRI, ghi chú khám) do bác sĩ vi
 - Câu kết luận bình thường ("X bình thường", "chưa thấy bất thường X", "X liên tục") cũng là một mục, với assertion ABSENT.
 - Khi chính việc **không thấy một cấu trúc** là bất thường (ví dụ "không thấy xương mũi"), đó là biểu hiện có (PRESENT) và `phrase` giữ chữ "không thấy".
 - Một biểu hiện được nhắc nhiều lần (mô tả một tổn thương rồi gọi tên chính tổn thương đó, hoặc nhắc lại ở chỗ khác) vẫn là một mục, theo kết luận của bác sĩ. Các biểu hiện khác nhau được nêu làm căn cứ cho một kết luận thì mỗi cái vẫn là một mục.
-- Con số đo không kèm chữ kết luận (ví dụ "chiều dài xương đùi 32 mm") không phải mục: bác sĩ chưa kết luận gì, tự diễn giải con số là thêm thông tin không có trong mô tả. Có chữ kết luận ("dưới bách phân vị 3", "tăng") thì là mục.
-- Không đưa vào danh sách: gene và biến thể, kết quả xét nghiệm (máu, sàng lọc, di truyền, chọc ối), nhóm máu, tuổi, giới tính, nhịp tim ghi bằng số, chẩn đoán bệnh hay hội chứng di truyền (ví dụ trisomy 21, hội chứng Apert) vì đó là kết luận về nguyên nhân, không phải biểu hiện. Tên một dị tật hay bất thường hình thái (ví dụ dị tật Chiari, loạn sản thận) là biểu hiện, vẫn là mục.
+- Một số đo của thai hay phần phụ của thai trên siêu âm, MRI (kích thước, chiều dài, chỉ số, độ dày, độ mờ da gáy, nhịp tim thai, cân nặng ước lượng…) là một mục, dù có chữ kết luận hay không. Có chữ kết luận ("dày", "tăng", "dưới bách phân vị 3", "đa ối") thì mục theo kết luận đó như mọi biểu hiện khác. Không có chữ kết luận thì bác sĩ chưa kết luận gì và tự diễn giải con số là thêm thông tin không có trong mô tả, nên mục đó có `phrase` là "bất thường" + đại lượng được đo, assertion UNCERTAIN, assessment ASSESSED: bác sĩ sẽ tự chọn trạng thái khi xem.
+- Tuổi thai không phải mục (nó là temporality).
+- Không đưa vào danh sách: gene và biến thể, kết quả xét nghiệm (máu, sàng lọc, di truyền, chọc ối), nhóm máu, tuổi, giới tính, chẩn đoán bệnh hay hội chứng di truyền (ví dụ trisomy 21, hội chứng Apert) vì đó là kết luận về nguyên nhân, không phải biểu hiện. Tên một dị tật hay bất thường hình thái (ví dụ dị tật Chiari, loạn sản thận) là biểu hiện, vẫn là mục.
 - Chỉ lấy kết luận của lần khám hiện tại. Biểu hiện lần trước có mà nay đã hết thì ghi ABSENT.
 
 # Trường `phrase`
@@ -18,6 +19,10 @@ Bạn đọc mô tả khám thai (siêu âm, MRI, ghi chú khám) do bác sĩ vi
 - **Dùng đúng chữ bác sĩ viết.** Không dịch, không đổi sang thuật ngữ khác, không thêm chữ bác sĩ không viết.
 - `phrase` là **thứ được kết luận**, còn kết luận nằm ở assertion và assessment. Phép thử: ghép assertion với `phrase` ("có …", "không có …", "nghi …", "chưa rõ …") phải nói lại đúng ý bác sĩ. Vì vậy `phrase` là tên một bất thường; khi bác sĩ kết luận một cấu trúc bình thường thì `phrase` là "bất thường" + tên cấu trúc, assertion ABSENT; mọi ý có/không/bình thường/nghi ngờ đều chuyển sang assertion, không để lại trong `phrase`.
 - Không chứa chủ thể ("mẹ"), không chứa con số đo.
+
+# Trường `measurement`
+
+Khi câu nguồn có số đo của chính biểu hiện này: `quantity` là đại lượng được đo, `value` là con số kèm đơn vị, cả hai chép đúng từng chữ như trong câu nguồn. Không đổi đơn vị, không làm tròn, không thêm chữ. Biểu hiện không có số đo thì để trống.
 
 # Trường `source_text`
 
@@ -32,7 +37,7 @@ assertion — biểu hiện được kết luận thế nào:
 - UNCERTAIN: không kết luận được (khảo sát hạn chế, không đánh giá được, chưa khảo sát).
 
 assessment — lần khám này đã khảo sát được đến mức nào (đề nghị khám thêm để xác định không làm đổi mức này):
-- ASSESSED: đã khảo sát và có kết luận.
+- ASSESSED: đã khảo sát (đã đo, hoặc đã kết luận).
 - LIMITED: có khảo sát nhưng hạn chế ("khó đánh giá", "chưa thấy rõ", "chưa khảo sát đủ", "chưa thấy, hẹn khảo sát lại").
 - NOT_ASSESSABLE: không thể khảo sát ("không đánh giá được", "không quan sát được", "chưa khảo sát được do tư thế").
 - NOT_ASSESSED: chưa khảo sát, không nêu gì cản trở.
@@ -51,4 +56,5 @@ temporality: tuổi thai lúc quan sát nếu mô tả có nêu, ví dụ "22 tu
 - "Tim bình thường, mỏm vai liên tục" → `bất thường tim`, `bất thường mỏm vai` (ABSENT, ASSESSED).
 - "Nang ống mật chủ – giãn đường mật trong gan" → hai mục: `nang ống mật chủ`, `giãn đường mật trong gan`.
 - "Không thấy rõ xương mũi, nghi bất sản xương mũi" → một mục: `bất sản xương mũi` (SUSPECTED, ASSESSED).
-- "Đường kính lưỡng đỉnh 52 mm, chỉ số ối 12 cm" → không có mục nào: chỉ có số đo, không có kết luận.
+- "Chiều dài xương chày 31 mm" → `bất thường chiều dài xương chày` (UNCERTAIN, ASSESSED), measurement: `Chiều dài xương chày`, `31 mm`.
+- "Đường kính tiểu não ngang nhỏ, 18 mm" → `đường kính tiểu não ngang nhỏ` (PRESENT, ASSESSED), measurement: `Đường kính tiểu não ngang`, `18 mm`.

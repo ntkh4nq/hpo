@@ -57,6 +57,15 @@ class SourceRow(NamedTuple):           # what an explanation shows of one source
     freq_raw: str | None
     evidence: str | None
     references: list[str]
+    patients: int = 0                  # freq_den of an "n/m" row: how many reported patients it rests on
+
+
+class TraitRow(NamedTuple):            # one disease_phenotype row with aspect I (inheritance) or C (clinical course)
+    disease_id: str
+    aspect: str
+    hpo_id: str
+    freq_raw: str | None
+    references: list[str] | None
 
 
 @dataclass
@@ -74,6 +83,7 @@ class Index:
     genes: dict[str, list[Gene]]                         # D -> genes, by symbol
     labels: dict[str, tuple[str, str | None]]            # term -> (label_en, label_vi)
     prenatal: frozenset[str]
+    traits: dict[str, list[TraitRow]] = field(default_factory=dict)  # D -> aspect I/C rows, in KB order
     # derived (build_index): numpy arrays of disease positions, for scoring every disease at once
     position: dict[str, int] = field(default_factory=dict)
     under: dict[str, tuple[np.ndarray, np.ndarray]] = field(default_factory=dict)           # a -> (D, max freq)
@@ -92,7 +102,8 @@ def _freq_array(values: list[float | None]) -> np.ndarray:
 def build_index(*, hpo_release: str, ancestors: dict[str, Iterable[str]], ic: dict[str, float],
                 annotations: Iterable[Annotation], diseases: dict[str, tuple[str | None, str]],
                 genes: dict[str, list[Gene]], labels: dict[str, tuple[str, str | None]],
-                prenatal: Iterable[str], frequency_terms: dict[str, float] | None = None) -> Index:
+                prenatal: Iterable[str], frequency_terms: dict[str, float] | None = None,
+                traits: Iterable[TraitRow] = ()) -> Index:
     """Index from plain KB rows; `diseases` maps disease_id -> (name, db)."""
     ancestors = {t: frozenset(a) for t, a in ancestors.items()}
     pos_freqs: dict[tuple[str, str], list[float | None]] = {}
@@ -105,7 +116,7 @@ def build_index(*, hpo_release: str, ancestors: dict[str, Iterable[str]], ic: di
         key = (a.disease_id, a.hpo_id)
         (neg_freqs if negative else pos_freqs).setdefault(key, []).append(f)
         (excluded_rows if negative else rows).setdefault(key, []).append(
-            SourceRow(a.freq_raw, a.evidence, list(a.references or [])))
+            SourceRow(a.freq_raw, a.evidence, list(a.references or []), a.freq_den or 0))
 
     direct: dict[str, dict[str, float | None]] = {}
     for (d, t), fs in pos_freqs.items():
@@ -124,6 +135,9 @@ def build_index(*, hpo_release: str, ancestors: dict[str, Iterable[str]], ic: di
         disease_db={d: diseases.get(d, (None, d.split(":", 1)[0]))[1] for d in disease_ids},
         genes={d: genes.get(d, []) for d in disease_ids}, labels=labels, prenatal=frozenset(prenatal),
     )
+    for row in traits:
+        if row.disease_id in direct:
+            index.traits.setdefault(row.disease_id, []).append(row)
     index.position = {d: i for i, d in enumerate(disease_ids)}
 
     # true-path rule: a positive annotation of t is also one of every ancestor of t; keep the largest frequency
@@ -172,6 +186,9 @@ def load_index() -> Index:
             """SELECT disease_id, hpo_id, is_negated, freq_raw, freq_num, freq_den, freq_hpo, freq_pct,
                       evidence, "references"
                FROM disease_phenotype WHERE aspect = 'P' ORDER BY id""")]
+        traits = [TraitRow(*r) for r in conn.execute(
+            """SELECT disease_id, aspect, hpo_id, freq_raw, "references"
+               FROM disease_phenotype WHERE aspect IN ('I', 'C') AND NOT is_negated ORDER BY id""")]
         diseases = {d: (name, db) for d, name, db in conn.execute("SELECT disease_id, name, db FROM disease")}
         genes: dict[str, list[Gene]] = {}
         for d, gid, sym, assoc, src in conn.execute(
@@ -179,4 +196,4 @@ def load_index() -> Index:
                    FROM gene_disease gd JOIN gene g USING (ncbi_gene_id) ORDER BY g.symbol, g.ncbi_gene_id"""):
             genes.setdefault(d, []).append(Gene(ncbi_gene_id=gid, symbol=sym, association_type=assoc, source=src))
     return build_index(hpo_release=hpo_release(), ancestors=ancestors, ic=ic, annotations=annotations,
-                       diseases=diseases, genes=genes, labels=labels, prenatal=prenatal)
+                       diseases=diseases, genes=genes, labels=labels, prenatal=prenatal, traits=traits)

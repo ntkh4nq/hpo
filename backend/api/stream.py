@@ -3,6 +3,7 @@
 Event types: case, step, text, answer_reset, artifact, review, done, error. A response ends after review, done or
 error. The supervisor's text streams word by word, but the last `holdback_chars` characters of a message are held
 back until the guard passes it, so a banned phrase never reaches the screen (T97). Stream shapes: T98 (2).
+Every turn is also written to `case_turn` as the doctor saw it (TurnRecord, T116).
 """
 
 import json
@@ -17,6 +18,7 @@ from langfuse.langchain import CallbackHandler
 
 from agent.guard import banned_match, citations
 from agent.state import CONFIG, effective_findings
+from api import case_store
 
 STREAM_MODES = ["messages", "updates", "tasks", "custom"]
 WORKFLOW_NODES = {"extract", "remap_one", "split", "find_candidates", "choose_terms", "check_choices"}
@@ -24,6 +26,45 @@ WORKFLOW_NODES = {"extract", "remap_one", "split", "find_candidates", "choose_te
 
 def sse(event: str, data) -> bytes:
     return format_sse_event(event=event, data_str=json.dumps(data, ensure_ascii=False, default=str))
+
+
+class TurnRecord:
+    """What one turn showed: steps in first-emit order with their last status, and per message the text actually sent
+    (an answer reset clears it). Written to case_turn when the turn ends, whatever the end (T116)."""
+
+    def __init__(self, case_id: str, route: str, input_: dict):
+        self.case_id, self.order, self.steps, self.texts = case_id, [], {}, {}
+        self.outcome, self.citations = "error", []
+        self.turn_no = case_store.start_turn(case_id, route, input_)
+
+    def sse(self, event: str, data) -> bytes:
+        if event == "step":
+            if data["id"] not in self.steps:
+                self.order.append(("step", data["id"]))
+            self.steps[data["id"]] = data
+        elif event == "text":
+            mid = data["message_id"]
+            if mid not in self.texts:
+                self.order.append(("text", mid))
+            self.texts[mid] = self.texts.get(mid, "") + data["delta"]
+        elif event == "answer_reset":
+            self.texts[data["message_id"]] = ""
+        elif event in ("review", "done", "error"):
+            self.outcome = event
+            self.citations = data.get("citations", []) if event == "done" else []
+        return sse(event, data)
+
+    def items(self) -> list[dict]:
+        out = []
+        for kind, key in self.order:
+            if kind == "step":
+                out.append({"kind": "step", "step": self.steps[key]})
+            elif self.texts[key]:
+                out.append({"kind": "text", "message_id": key, "text": self.texts[key]})
+        return out
+
+    def finish(self) -> None:
+        case_store.finish_turn(self.case_id, self.turn_no, self.items(), self.outcome, self.citations)
 
 
 def pending_review(snapshot) -> dict | None:
@@ -81,7 +122,7 @@ def summary(key: str, result) -> dict | None:
         if key == "tool:analyze_findings" and result.get("findings") is not None:
             ranking = result.get("ranking") or {"suggestions": []}
             return {"findings": len(result["findings"]), "suggestions": len(ranking["suggestions"])}
-        if key in ("tool:search_disease", "tool:search_hpo"):
+        if key in ("tool:search_disease", "tool:search_hpo", "tool:find_passages"):
             found = _tool_payload(result)
             return {"results": len(found)} if isinstance(found, list) else None
         if key == "tool:explain_disease":
@@ -143,7 +184,10 @@ class Steps:
         if name in WORKFLOW_NODES:
             if start:
                 tool_task = next((p.split(":", 1)[1] for p in ns if p.startswith("tools:")), None)
-                return [self._emit({"id": payload["id"], "parent_id": self.call_of_task.get(tool_task), "kind": "node",
+                # Phase 3's steps run inside `extract`: "Phân tích mô tả" is their parent row (T134 (5)).
+                extract_task = next((p.split(":", 1)[1] for p in ns if p.startswith("extract:")), None)
+                parent = extract_task if extract_task in self.open else self.call_of_task.get(tool_task)
+                return [self._emit({"id": payload["id"], "parent_id": parent, "kind": "node",
                                     "key": name, "label": None, "params": None}, "running")]
             step = self.open.get(payload["id"])
             return self._finish(step, payload) if step else []
@@ -161,11 +205,14 @@ class Steps:
         return [self._emit(step, "error") for step in list(self.open.values())]
 
 
-async def run_turn(graph, case_id: str, graph_input, view: Callable[[object], dict],
+async def run_turn(graph, case_id: str, graph_input, view: Callable[[object], dict], route: str, input_: dict,
                    new_case: bool = False) -> AsyncIterator[bytes]:
-    """Run one turn and yield its SSE events. `view(snapshot)` builds the CaseView sent with `done`."""
+    """Run one turn and yield its SSE events. `view(snapshot)` builds the CaseView sent with `done`.
+    `route` ('message' | 'review') and `input_` (the request body) are recorded with the turn."""
     config = {"configurable": {"thread_id": case_id}}
     hold, steps, checked = Holdback(CONFIG["holdback_chars"]), Steps(), []
+    record = TurnRecord(case_id, route, input_)
+    sse = record.sse   # every event goes through the record
     try:
         with get_client().start_as_current_observation(name="case:turn", as_type="span"), \
                 propagate_attributes(session_id=case_id):
@@ -208,7 +255,8 @@ async def run_turn(graph, case_id: str, graph_input, view: Callable[[object], di
                             yield sse("artifact", {"kind": "ranking", "data": update["ranking"]})
             snapshot = await graph.aget_state(config)
             if (review := pending_review(snapshot)) is not None:
-                yield sse("review", {"findings": review["findings"]})
+                yield sse("review", {"findings": review["findings"], "carry_over": review.get("carry_over"),
+                                     "description": review.get("description")})
             else:
                 yield sse("done", {"citations": citations(checked), "view": view(snapshot)})
     except ModelCallLimitExceededError:
@@ -221,3 +269,5 @@ async def run_turn(graph, case_id: str, graph_input, view: Callable[[object], di
             yield sse("step", step)
         code = "model_unavailable" if isinstance(exc, openai.APIError) else "internal_error"
         yield sse("error", {"code": code, "message": str(exc) or type(exc).__name__})
+    finally:
+        record.finish()   # synchronous: also runs when the client left and the generator is closed

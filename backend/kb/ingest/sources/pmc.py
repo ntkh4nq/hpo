@@ -1,7 +1,8 @@
 """Articles linked from the Fe2Gen collection (docs/ingestion-plan.md §2–§4, T70).
 
 Full text (JATS XML + images from the PMC open-data bucket) when the licence is open, otherwise the
-PubMed abstract. The source declares no disease codes (T75), so `disease_ids` stays empty.
+PubMed abstract. The source declares no disease codes (T75): an admin declares them (table declared_disease,
+docs/evidence-plan.md §6) and the pipeline reads them from there.
 """
 
 import hashlib
@@ -20,7 +21,7 @@ from kb.ingest.config import SOURCE_SETTINGS
 from kb.ingest.model import DocRef, ManifestFile, ParsedDocument, absolute, rel
 from kb.ingest.sources import pubmed
 
-DECLARES_CODES = False  # no codes declared: never filtered by scope (T75)
+DECLARES_CODES = False  # codes come from declared_disease; never filtered by scope (T75, evidence-plan §6)
 CFG = SOURCE_SETTINGS["pmc"]
 PUBMED_LINK = re.compile(r"(?:pubmed\.ncbi\.nlm\.nih\.gov/|ncbi\.nlm\.nih\.gov/pubmed/)(\d+)")
 PMC_LINK = re.compile(r"ncbi\.nlm\.nih\.gov/(?:pmc/)?articles/(PMC\d+)")
@@ -158,7 +159,3 @@ def parse(raw_path: Path) -> ParsedDocument:
         license=meta_json["license_code"], language="en", doc_type="article", raw_path=rel(raw_path),
         sections=jats.read_sections(meta, root.find("body"), raw_path.parent, CFG["skip_sections"],
                                     root.find("floats-group")))
-
-
-def declared_disease_ids(doc: ParsedDocument, conn) -> list[str]:
-    return []

@@ -1,0 +1,106 @@
+/* App shell: sidebar | main (header, scrolling thread, composer dock). */
+.app-shell {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr); /* without this the row grows to the thread's full height and the shell itself scrolls */
+  height: 100%;
+  overflow: hidden;
+  background: var(--background);
+}
+
+.workspace-main-area {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  position: relative;
+}
+
+/* Header */
+.app-header {
+  position: relative;
+  z-index: 5;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  height: var(--header-height);
+  padding: 0 16px;
+  flex-shrink: 0;
+  background: var(--background);
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--transition-fast);
+}
+.workspace-main-area--scrolled .app-header { border-bottom-color: var(--line); }
+.header-left { display: flex; align-items: center; gap: 4px; min-width: 0; }
+.header-left > .tooltip-anchor { flex: none; } /* the menu button must not shrink under a long case title */
+.header-center { display: flex; justify-content: center; min-width: 0; }
+
+/* Body row: thread column + (wide screens) case progress panel */
+.workspace-body { flex: 1; min-height: 0; display: flex; }
+.workspace-column { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+
+/* Thread — the single scroll container */
+.clinical-canvas {
+  position: relative; /* containing block for absolute descendants (e.g. .sr-only), so they can never overflow the shell */
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-padding-top: 16px;
+  outline: none;
+}
+.thread {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  width: 100%;
+  max-width: calc(var(--thread-width) + 48px);
+  margin: 0 auto;
+  padding: 24px 24px 40px;
+}
+.workspace-alerts { display: grid; gap: 8px; }
+.workspace-alerts:empty { display: none; }
+
+/* Welcome (no analysis yet): composer centered in the viewport */
+.clinical-canvas--welcome .thread { min-height: 100%; justify-content: center; padding-bottom: 12vh; }
+.welcome { display: grid; gap: 24px; outline: none; }
+.welcome-heading { display: grid; justify-items: center; gap: 8px; text-align: center; }
+.welcome-heading img { margin-bottom: 4px; }
+.welcome-heading h2 { font-size: 28px; font-weight: 600; letter-spacing: -0.02em; }
+.welcome-heading p { color: var(--text-secondary); }
+
+/* Turns */
+.turn { display: flex; flex-direction: column; gap: 12px; min-width: 0; outline: none; scroll-margin-top: 16px; }
+.turn--user { align-items: stretch; }
+.turn-body { min-width: 0; }
+.workflow-heading { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.workflow-heading h2 { font-size: 18px; font-weight: 600; outline-offset: 4px; border-radius: var(--radius-xs); }
+
+/* Composer dock */
+.composer-dock {
+  flex-shrink: 0;
+  width: 100%;
+  max-width: calc(var(--thread-width) + 48px);
+  margin: 0 auto;
+  padding: 0 24px 10px;
+  background: linear-gradient(to bottom, transparent, var(--background) 24px);
+}
+.composer-dock__note {
+  padding-top: 8px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* Narrow screens */
+@media (max-width: 1024px) {
+  .app-shell { grid-template-columns: minmax(0, 1fr); }
+  .app-header { padding: 0 8px 0 4px; }
+}
+@media (max-width: 640px) {
+  .thread { padding: 16px 16px 32px; gap: 24px; }
+  .composer-dock { padding: 0 12px 8px; }
+  .app-header { grid-template-columns: minmax(0, 1fr) auto auto; }
+  .welcome-heading h2 { font-size: 22px; }
+}

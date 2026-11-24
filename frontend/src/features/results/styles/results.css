@@ -1,0 +1,139 @@
+/* Results panel — not a card; sits inside the assistant turn */
+.results-panel { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
+.results-loading { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-secondary); }
+.section-title { font-size: 16px; font-weight: 600; color: var(--text-primary); }
+.section-title__count { margin-left: 4px; font-weight: 500; color: var(--text-muted); }
+.results-section { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+
+/* Summary — plain prose, not a card */
+.results-summary { font-size: 15px; line-height: 1.65; color: var(--text-primary); overflow-wrap: anywhere; }
+.results-facts { font-size: 14px; line-height: 1.6; color: var(--text-secondary); overflow-wrap: anywhere; margin-bottom: 12px; }
+.results-facts__title { color: var(--text-primary); font-weight: 500; }
+.results-section__head { display: flex; flex-direction: column; gap: 2px; }
+/* Under a summary, a rule marks where the list starts. */
+.results-summary ~ .results-section .results-section__head { padding-top: 18px; border-top: 1px solid var(--line); }
+.results-section__hint { font-size: 12px; color: var(--text-muted); }
+
+/* Suggestions: one row per disease (ResultsPanel.tsx) */
+.candidate-list { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface); overflow: hidden; }
+.candidate-list > li + li { border-top: 1px solid var(--line); }
+.candidate-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+  padding: 11px 12px 11px 14px;
+  border: 0;
+  background: transparent;
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+.candidate-row:hover { background: var(--surface-hover); }
+.candidate-row__main { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.candidate-row__name { font-size: 14px; font-weight: 600; line-height: 1.4; overflow-wrap: anywhere; }
+.candidate-row__genes { font-size: 13px; color: var(--text-secondary); overflow-wrap: anywhere; }
+.candidate-row__match { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; font-size: 12px; color: var(--text-secondary); white-space: nowrap; }
+.candidate-row__conflict { color: var(--text-muted); }
+.candidate-row__chevron { display: inline-flex; flex: none; color: var(--text-muted); }
+
+/* Suggestion dialog body (CandidateDialog.tsx) */
+.candidate-overview { font-size: 14px; line-height: 1.6; color: var(--text-primary); overflow-wrap: anywhere; }
+.candidate-overview__source { font-size: 12px; color: var(--text-muted); }
+.candidate-matches { display: flex; flex-direction: column; gap: 0; min-width: 0; }
+.candidate-match { display: flex; flex-direction: column; gap: 4px; min-width: 0; padding: 9px 0; border-bottom: 1px solid var(--line); }
+.candidate-match:first-child { padding-top: 2px; }
+.candidate-match__head { display: flex; align-items: baseline; justify-content: space-between; gap: 4px 16px; flex-wrap: wrap; }
+.candidate-match__name { flex: 1 1 200px; min-width: 0; font-size: 14px; font-weight: 500; overflow-wrap: anywhere; }
+.candidate-match__frequency { font-size: 13px; color: var(--text-secondary); }
+.candidate-match__note { font-size: 13px; color: var(--text-muted); overflow-wrap: anywhere; }
+.candidate-match__loading { margin-top: 8px; font-size: 13px; }
+.candidate-matches__hint { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+.candidate-match__basis { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; font-size: 12px; }
+.candidate-match__basis-row { display: inline-flex; align-items: baseline; gap: 6px; }
+.candidate-refs { display: inline-flex; flex-wrap: wrap; gap: 0 8px; margin-left: 6px; }
+.candidate-refs--bare { margin-left: 0; }
+.candidate-traits { display: flex; flex-direction: column; gap: 8px; margin: 0; }
+.candidate-traits__row { display: grid; grid-template-columns: 140px 1fr; gap: 4px 12px; font-size: 14px; }
+.candidate-traits__row dt { color: var(--text-secondary); }
+.candidate-traits__row dd { display: flex; flex-direction: column; gap: 2px; margin: 0; color: var(--text-primary); overflow-wrap: anywhere; }
+@media (max-width: 640px) { .candidate-traits__row { grid-template-columns: 1fr; } }
+.candidate-plain { font-size: 14px; color: var(--text-secondary); overflow-wrap: anywhere; }
+.candidate-literature {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--info-soft);
+}
+.candidate-literature__refs { display: inline-flex; flex-wrap: wrap; gap: 0 8px; }
+.candidate-literature__claim { font-size: 13px; line-height: 1.55; color: var(--text-primary); overflow-wrap: anywhere; }
+.candidate-link {
+  display: inline;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--info);
+  font: inherit;
+  font-weight: 500;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+.candidate-link:hover { color: var(--primary-dark); }
+.candidate-sources { display: flex; flex-direction: column; gap: 8px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 13px; }
+.candidate-sources__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  padding: 2px 6px 2px 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.candidate-sources__toggle svg { transition: transform var(--transition-fast); }
+.candidate-sources__toggle[aria-expanded="true"] svg { transform: rotate(90deg); }
+.candidate-sources__body { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.candidate-sources__docs { display: flex; flex-direction: column; gap: 4px; }
+.candidate-sources__refs { color: var(--text-secondary); overflow-wrap: anywhere; }
+
+/* Context notes used in this retrieval */
+.result-explanation {
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  font-size: 13px;
+}
+.result-explanation > summary { font-weight: 600; color: var(--text-secondary); cursor: pointer; }
+
+.skipped-list { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; overflow-wrap: anywhere; }
+
+/* T114: a disease named in the summary opens its details; a cited paper opens its source page. Quiet: weight + underline. */
+/* A disease name in supervisor text opens its details: bold like a term, no underline until hover (user 2026-11-24). */
+.summary-ref {
+  color: var(--text-primary);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+.summary-ref:hover { color: var(--primary); text-decoration: underline; text-underline-offset: 3px; }
+.summary-ref:focus-visible, .summary-source:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; border-radius: 2px; }
+.summary-source { color: var(--primary); text-decoration: underline; text-underline-offset: 3px; }
+/* a numbered citation "[1]" reads like a footnote mark */
+.summary-source--cite { font-size: 0.8em; vertical-align: super; line-height: 0; text-decoration: none; }
+.summary-source--cite::before { content: "["; }
+.summary-source--cite::after { content: "]"; margin-left: 0; font-size: inherit; }
+.summary-source::after { content: "\2197"; margin-left: 1px; font-size: 0.85em; }
+.summary-source:hover { color: var(--primary-dark); }
+
+.results-outdated { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; font-size: 14px; }

@@ -11,7 +11,7 @@ def gold(phrase, assertion, hpo_id, assessment="ASSESSED", subject="FETUS"):
 
 
 def finding(phrase, assertion, status, hpo_id=None, assessment="ASSESSED", subject="FETUS"):
-    term = Term(hpo_id=hpo_id, label_en="x", label_vi=None, label_vi_reviewed=False, definition_en=None) if hpo_id else None
+    term = Term(hpo_id=hpo_id, label_en="x", definition_en=None) if hpo_id else None
     return Finding(phrase=phrase, source_text=phrase, assertion=assertion, assessment=assessment, temporality=None,
                    subject=subject, mapping_status=status, term=term)
 

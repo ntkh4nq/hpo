@@ -15,7 +15,8 @@ dependencies = [
     "docling>=2.150.1",
     "tokenizers>=0.23.3",
     "python-multipart>=0.0.34",
-    "langgraph-checkpoint-redis>=0.6.0",
+    "langgraph-checkpoint-postgres>=3.2.1",
+    "psycopg-pool>=3.3.3",
 ]
 
 [dependency-groups]

@@ -15,7 +15,9 @@ def test_gold_against_itself_is_perfect():
 def test_dataset_shape():
     cases = load_cases()
     assert len(cases) == 40 and len({c["id"] for c in cases}) == 40
-    assert all(3 <= len(c["items"]) <= 12 for c in cases)
+    written = [[i for i in c["items"] if not (i.get("measurement") and i["assertion"] == "UNCERTAIN")] for c in cases]
+    assert all(3 <= len(items) <= 12 for items in written)   # measurements awaiting the doctor (T119) not counted
+    assert sum(len(c["items"]) for c in cases) - sum(map(len, written)) == 5
 
 
 def test_similarity_keeps_diacritics_and_ignores_case():
@@ -31,3 +33,15 @@ def test_missed_extra_and_wrong_status():
     assert [p["phrase"] for p in s["extra"]] == ["dây rốn quấn cổ"]
     assert s["wrong_status"][0]["fields"] == ["assertion"]
     assert s["fuzzy"] == [("ối", "nước ối", 0.67)]
+
+
+def test_measurement_value_is_scored_only_when_gold_has_one():
+    gold = [{**item("bất thường chỉ số ối", "UNCERTAIN"), "measurement": {"quantity": "chỉ số ối", "value": "26 cm"}},
+            item("đa ối")]
+    pred = [{**item("bất thường chỉ số ối", "UNCERTAIN"), "measurement": {"quantity": "chỉ số ối", "value": "26  cm"}},
+            {**item("đa ối"), "measurement": {"quantity": "x", "value": "1"}}]
+    assert score_case(gold, pred)["measured"] == 1 and score_case(gold, pred)["wrong_measurement"] == []
+    pred[0]["measurement"]["value"] = "2,6 cm"
+    assert len(score_case(gold, pred)["wrong_measurement"]) == 1
+    pred[0]["measurement"] = None
+    assert len(score_case(gold, pred)["wrong_measurement"]) == 1

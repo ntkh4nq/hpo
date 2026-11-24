@@ -22,6 +22,16 @@ top_n = 10
 unmentioned_min_frequency = 0.3
 unmentioned_limit = 5
 
+# An absent finding conflicts with a disease that records it (or a more specific term) with frequency >= 0.3 (lower
+# bound of HPO "Frequent", as unmentioned_min_frequency) or with no frequency (T130). Shown only; ranks never change.
+conflict_min_frequency = 0.3
+
+# Fetal grouping nodes (T131): almost every fetal term sits under them (Abnormal fetal morphology, Abnormality of
+# the fetus, Abnormality of prenatal development or birth), so sharing one says nothing about two findings. Their IC
+# is not low (3.59 / 3.06 / 2.37, few diseases carry fetal terms), so an IC threshold cannot catch them. A "related"
+# match never goes through them or their ancestors; absent findings at one of them are not checked for conflicts.
+grouping_nodes = ["HP:0034058", "HP:0034057", "HP:0001197"]
+
 # HPO frequency terms -> midpoint of their range (ranking-plan §3.2). Non-zero values equal the PhenoBrain
 # defaults (hpo_reader.py, mode = 1); Excluded (0%) means "recorded as absent".
 [frequency_terms]

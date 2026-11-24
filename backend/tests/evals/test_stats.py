@@ -47,3 +47,12 @@ def test_paired_ratio_diff():
     assert (diff, lo, hi) == (1.0, 1.0, 1.0)
     with pytest.raises(ValueError):
         paired_bootstrap_ratio_diff([1], [1], [1, 2], [1, 2])
+
+
+def test_cohen_kappa():
+    from evals.common.stats import cohen_kappa
+
+    a = [True] * 10 + [False] * 10
+    b = [True] * 8 + [False] * 2 + [True] * 2 + [False] * 8    # 16/20 agree, chance 0.5
+    assert cohen_kappa(a, b) == pytest.approx(0.6)
+    assert cohen_kappa(a, a) == 1.0

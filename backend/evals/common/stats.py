@@ -50,3 +50,13 @@ def paired_bootstrap_ratio_diff(num_a: Sequence[float], den_a: Sequence[float], 
     diffs = sb[ok] / tb[ok] - sa[ok] / ta[ok]
     return (float(xb.sum() / yb.sum() - xa.sum() / ya.sum()),
             float(np.percentile(diffs, 2.5)), float(np.percentile(diffs, 97.5)))
+
+
+def cohen_kappa(a: Sequence[bool], b: Sequence[bool]) -> float:
+    """Cohen's kappa of two binary labelings of the same items (judge calibration, T7c)."""
+    x, y = np.asarray(a, dtype=bool), np.asarray(b, dtype=bool)
+    if x.shape != y.shape or not len(x):
+        raise ValueError("a and b must label the same, non-empty items")
+    observed = float((x == y).mean())
+    expected = float(x.mean() * y.mean() + (1 - x.mean()) * (1 - y.mean()))
+    return 1.0 if expected == 1 else (observed - expected) / (1 - expected)

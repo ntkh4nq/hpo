@@ -28,7 +28,7 @@ from evals.common.provenance import git_version
 from evals.common.tree import neighbours
 from evals.e2.check import DATASET as CASES_FILE, load_cases
 from evals.e2.dataset import DATASET
-from evals.common.matching import CONFIG as MATCH_CONFIG, match
+from evals.common.matching import CONFIG as MATCH_CONFIG, match, measurement_ok
 from evals.split_check.score import STATUS_FIELDS
 from evals.common.stats import bootstrap_ratio_ci
 from phenotype import mapping, split
@@ -99,10 +99,13 @@ def score_case(gold: list[dict], analysis: dict | None, near: dict[str, set[str]
     """e2-plan §7.1 for one case; a case whose run raised counts as having no findings."""
     findings = analysis["findings"] if analysis else []
     pairs = match(gold, findings, MATCH_CONFIG["match_threshold"])
-    correct = near_correct = status_correct = 0
+    correct = near_correct = status_correct = measured = measurement_correct = 0
     for gi, pi, _ in pairs:
         g, f = gold[gi], findings[pi]
         status_correct += all(g[k] == f[k] for k in STATUS_FIELDS)
+        if (ok := measurement_ok(g, f)) is not None:
+            measured += 1
+            measurement_correct += ok
         if g["hpo_id"] is None:
             right = near_right = f["mapping_status"] == "UNMAPPED"
         else:
@@ -116,7 +119,7 @@ def score_case(gold: list[dict], analysis: dict | None, near: dict[str, set[str]
     P = {(f["term"]["hpo_id"], f["assertion"]) for f in findings if f["mapping_status"] == "MAPPED"}
     return {
         "gold_items": len(gold), "model_items": len(findings), "matched": len(pairs),
-        "status_correct": status_correct,
+        "status_correct": status_correct, "measured": measured, "measurement_correct": measurement_correct,
         "assertion_pairs": [[gold[gi]["assertion"], findings[pi]["assertion"]] for gi, pi, _ in pairs],
         "correct": correct, "near_correct": near_correct,
         "ambiguous": statuses["AMBIGUOUS"], "unmapped": statuses["UNMAPPED"],
@@ -145,6 +148,7 @@ def totals(scores: list[dict], seconds: list[dict[str, float]]) -> dict:
     out["split_f1"] = f1(out["split_precision"][0], out["split_recall"][0])
     out["profile_f1"] = f1(out["profile_precision"][0], out["profile_recall"][0])
     out["status_accuracy"] = ratio(scores, "status_correct", "matched")
+    out["measurement_accuracy"] = ratio(scores, "measurement_correct", "measured")
     out["ambiguous_rate"] = ratio(scores, "ambiguous", "matched")
     out["unmapped_rate"] = ratio(scores, "unmapped", "matched")
     for k in ("rejections", "gold_items", "model_items", "matched", "split_failed", "choose_failed", "error"):
@@ -162,7 +166,7 @@ def print_totals(t: dict) -> None:
     for name in RATIOS:
         v, lo, hi = t[name]
         print(f"  {name:24} {v:.3f} [{lo:.3f}, {hi:.3f}]")
-    for k in ("split_f1", "profile_f1", "status_accuracy", "ambiguous_rate", "unmapped_rate"):
+    for k in ("split_f1", "profile_f1", "status_accuracy", "measurement_accuracy", "ambiguous_rate", "unmapped_rate"):
         print(f"  {k:24} {t[k]:.3f}")
     for k in ("rejections", "split_failed", "choose_failed", "error"):
         print(f"  {k:24} {t[k]}")
@@ -194,6 +198,8 @@ def print_cases(cases: list[dict], record: dict, scores: list[dict], near: dict[
         for gi, pi, _ in pairs:
             g, f = gold[gi], findings[pi]
             wrong = [f"{k}: {g[k]} → {f[k]}" for k in STATUS_FIELDS if g[k] != f[k]]
+            if measurement_ok(g, f) is False:
+                wrong.append(f"số đo: {g['measurement']['value']} → {(f.get('measurement') or {}).get('value')}")
             code = f["term"]["hpo_id"] if f["mapping_status"] == "MAPPED" else f["mapping_status"]
             if code != (g["hpo_id"] or "UNMAPPED"):
                 near_mark = " (cha/con)" if code in near.get(g["hpo_id"], set()) else ""

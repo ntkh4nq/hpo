@@ -2,7 +2,7 @@
 
     python -m kb.ingest.cli download <source>     # §2: data/raw/<source>/<YYYY-MM-DD>/ + kb_manifest rows
     python -m kb.ingest.cli ingest <source>       # §8: one ingest job per document of the latest download
-    python -m kb.ingest.cli rechunk --strategy <name> [--docs 1,2,3]
+    python -m kb.ingest.cli rechunk --strategy <name> [--docs 1,2,3] [--replace]
     python -m kb.ingest.cli status
 """
 
@@ -12,14 +12,13 @@ import sys
 from datetime import UTC, date, datetime
 
 from core.db import connect
-from kb.ingest.config import CHUNKING
+from kb.ingest.config import CHUNKING, resolve_strategy
 from kb.ingest.fetch import sha256
 from kb.ingest.model import REPO_ROOT
-from kb.ingest.pipeline import resolve_strategy
 from kb.ingest.sources import SOURCES
 
 RAW = REPO_ROOT / "data" / "raw"
-PUBLIC = ["orphanet_def", "pubmed", "genereviews", "pmc"]
+PUBLIC = ["orphanet_def", "pubmed", "genereviews", "pmc", "medlineplus"]
 
 
 def download(source: str) -> None:
@@ -65,15 +64,19 @@ def ingest(source: str, command: str) -> int:
     return run_id
 
 
-def rechunk(strategy: str, doc_ids: list[int] | None, command: str) -> int:
-    """One rechunk job per document (given ones, or every ACTIVE/PENDING document)."""
+def rechunk(strategy: str, doc_ids: list[int] | None, command: str, replace: bool = False) -> int:
+    """One rechunk job per document (given ones, or every ACTIVE/PENDING document). A job replaces the document's
+    chunks of that strategy; without `replace`, documents that already have them are not queued, so re-running an
+    interrupted rechunk only builds what is missing."""
     if strategy not in CHUNKING or not isinstance(CHUNKING[strategy], dict):
         raise SystemExit(f"unknown strategy {strategy!r}")
     with connect() as conn:
         rows = conn.execute(
             "SELECT doc_id, source, source_ref, raw_path FROM document WHERE status IN ('ACTIVE', 'PENDING')"
-            + (" AND doc_id = ANY(%s)" if doc_ids else "") + " ORDER BY doc_id",
-            (doc_ids,) if doc_ids else ()).fetchall()
+            + (" AND doc_id = ANY(%(docs)s)" if doc_ids else "")
+            + ("" if replace else " AND NOT EXISTS (SELECT 1 FROM chunk c WHERE c.doc_id = document.doc_id"
+                                  " AND c.strategy = %(strategy)s)")
+            + " ORDER BY doc_id", {"docs": doc_ids, "strategy": strategy}).fetchall()
         run_id = new_run(conn, command, "rechunk")
         with conn.cursor() as cur:
             cur.executemany("INSERT INTO ingest_job (run_id, kind, source, source_ref, raw_path, strategy, doc_id)"
@@ -113,6 +116,7 @@ def main() -> None:
     p = sub.add_parser("rechunk", help="queue rechunk jobs for another strategy (§8)")
     p.add_argument("--strategy", required=True)
     p.add_argument("--docs", help="comma-separated doc_id list (default: every ACTIVE/PENDING document)")
+    p.add_argument("--replace", action="store_true", help="also rebuild documents that already have this strategy")
     sub.add_parser("status", help="documents, chunks and jobs by state; latest errors")
     args = parser.parse_args()
     command = "python -m kb.ingest.cli " + " ".join(sys.argv[1:])
@@ -121,7 +125,7 @@ def main() -> None:
     elif args.command == "ingest":
         ingest(args.source, command)
     elif args.command == "rechunk":
-        rechunk(args.strategy, [int(x) for x in args.docs.split(",")] if args.docs else None, command)
+        rechunk(args.strategy, [int(x) for x in args.docs.split(",")] if args.docs else None, command, args.replace)
     else:
         status()
 

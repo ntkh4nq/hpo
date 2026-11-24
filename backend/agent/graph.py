@@ -3,14 +3,14 @@
     START ─┬─ messages input       → supervisor (Deep Agents) → END
            └─ pending_action input → apply_findings_action    → END
 
-One thread per case (thread_id = case_id) on the Redis checkpointer (T92). A card edit after the suggestions
+One thread per case (thread_id = case_id) on the Postgres checkpointer (T116). A card edit after the suggestions
 re-ranks in code, never through the supervisor: 0 model requests (T91).
 """
 
 from langchain_core.language_models import BaseChatModel
 from langgraph.graph import END, START, StateGraph
 
-from agent.state import CaseState
+from agent.state import CaseState, case_event
 from agent.supervisor import build_supervisor
 from agent.tools import case_ranking
 
@@ -27,6 +27,9 @@ def apply_findings_action(state: CaseState) -> dict:
     update = {"edits": edits, "notes": {k: v for k, v in action["notes"].items() if v}, "pending_action": None}
     if edits != (state.get("edits") or {}):
         update["ranking"] = case_ranking({**state, "edits": edits}).model_dump(mode="json")
+        if update["ranking"] != state.get("ranking"):
+            # Earlier answers describe the old list; the next turn must not take them as current (T128).
+            update["messages"] = [case_event("findings_edited")]
     return update
 
 

@@ -1,0 +1,106 @@
+/* Follow-up thread (inside the case thread) */
+.chat-thread { display: flex; flex-direction: column; gap: 20px; }
+.chat-message { display: flex; gap: 12px; min-width: 0; }
+.chat-message--user { justify-content: flex-end; }
+.chat-message--user .chat-message__body {
+  max-width: 85%;
+  padding: 10px 16px;
+  border-radius: var(--radius-lg);
+  background: var(--surface-user);
+}
+.chat-message--assistant .chat-message__body { flex: 1; min-width: 0; padding-top: 3px; }
+.chat-message__text { white-space: pre-wrap; overflow-wrap: anywhere; }
+.chat-citations { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.citation-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--info-soft);
+  color: var(--info);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+.citation-pill:hover { background: var(--surface-hover); }
+a.citation-pill { text-decoration: none; }
+
+.chat-typing { display: inline-flex; align-items: center; gap: 4px; height: 28px; }
+.typing-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-muted); animation: typing-bounce 1.2s infinite ease-in-out; }
+.typing-dot:nth-child(2) { animation-delay: 0.15s; }
+.typing-dot:nth-child(3) { animation-delay: 0.3s; }
+@keyframes typing-bounce { 0%, 60%, 100% { transform: none; opacity: 0.5; } 30% { transform: translateY(-4px); opacity: 1; } }
+
+/* Docked composer */
+.chat-composer {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 8px 8px 8px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
+  transition: box-shadow var(--transition-fast);
+}
+.chat-composer:focus-within { box-shadow: var(--shadow-md), 0 0 0 3px var(--primary-soft); }
+.chat-composer__input {
+  flex: 1;
+  min-width: 0;
+  max-height: 180px;
+  padding: 7px 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  resize: none;
+  line-height: 1.5;
+}
+.chat-composer__input:focus-visible { box-shadow: none; outline: none; }
+.chat-composer__input:disabled { opacity: 1; cursor: not-allowed; }
+.chat-composer--locked { background: var(--surface-secondary); box-shadow: none; }
+.chat-composer__send {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--strong);
+  color: var(--on-strong);
+  cursor: pointer;
+  transition: background var(--transition-fast), opacity var(--transition-fast);
+}
+.chat-composer__send:hover:not(:disabled) { background: var(--strong-hover); }
+.chat-composer__send:disabled { opacity: 0.35; cursor: not-allowed; }
+/* Keep the one-line placeholder on one line on narrow screens. */
+.chat-composer__input:placeholder-shown { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.citation-pill--static { cursor: default; }
+.citation-pill--static:hover { background: var(--info-soft); }
+
+/* T114: a passage cited in an answer — a small numbered mark matching the numbered source pill. */
+.cite-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  margin: 0 1px;
+  padding: 0 4px;
+  border: 0;
+  border-radius: var(--radius-xs);
+  background: color-mix(in srgb, var(--primary) 16%, transparent);
+  color: var(--primary);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  vertical-align: 2px;
+  cursor: pointer;
+}
+.cite-mark:hover { background: color-mix(in srgb, var(--primary) 28%, transparent); }
+.cite-mark:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+.citation-pill__number { font-weight: 600; color: var(--primary); }

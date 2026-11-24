@@ -1,0 +1,176 @@
+/* Clinical input panel states */
+.clinical-input-panel {
+  width: 100%;
+  min-width: 0;
+}
+
+.clinical-input-panel--composer .composer-card {
+  box-shadow: var(--shadow-md);
+}
+
+.clinical-input-panel--editing {
+  align-self: stretch;
+}
+
+.clinical-input-panel--editing .composer-card {
+  box-shadow: var(--shadow-sm);
+}
+
+/* Composer card & textarea */
+.composer-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: box-shadow var(--transition-fast);
+}
+
+.composer-card:focus-within {
+  box-shadow: var(--shadow-md), 0 0 0 3px var(--primary-soft);
+}
+
+.input-label {
+  display: block;
+  padding: 14px 16px 0;
+}
+
+.description-textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 14px 16px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-primary);
+  resize: none;
+  line-height: 1.6;
+}
+
+.description-textarea:hover:not(:disabled),
+.description-textarea:focus-visible {
+  border-color: transparent;
+  box-shadow: none;
+  outline: none;
+}
+
+/* Sample scenario picker */
+.sample-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 12px 16px 0;
+  padding: 10px 12px;
+  background: var(--surface-secondary);
+  border-radius: var(--radius-sm);
+}
+
+.scenario-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.scenario-select {
+  flex: 1 1 200px;
+  min-width: 0;
+  min-height: 36px;
+}
+
+/* Bottom bar & actions */
+.composer-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 8px 12px 10px;
+  background: transparent;
+}
+
+.composer-bar__examples {
+  min-height: 32px;
+  padding: 0 10px;
+  font-size: 13px;
+}
+
+.composer-bar__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+
+.analyze-btn {
+  min-width: 124px;
+}
+
+/* Compact user turn bubble */
+.clinical-input-panel--compact {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  padding: 14px 18px;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: var(--surface-user);
+  color: var(--text-primary);
+}
+
+.patient-text-excerpt {
+  order: 1;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  overflow: hidden;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: var(--text-primary);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.patient-card-header {
+  order: 2;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-top: 4px;
+}
+
+
+.patient-edit-btn {
+  min-height: 28px;
+  padding: 0 10px;
+  font-size: 13px;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .clinical-input-panel--compact {
+    max-width: 100%;
+    padding: 12px 14px;
+  }
+
+  .scenario-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .scenario-select {
+    flex-basis: auto;
+    width: 100%;
+  }
+
+  .composer-bar {
+    padding: 8px 10px;
+  }
+}

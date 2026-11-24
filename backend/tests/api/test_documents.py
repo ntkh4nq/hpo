@@ -3,6 +3,7 @@
 An upload's source_ref is the file's sha256 (not 'TEST:…'), so this test removes what it made by doc_id.
 """
 
+import hashlib
 import shutil
 from pathlib import Path
 
@@ -25,6 +26,8 @@ def uploads():
     yield made
     with connect() as conn:
         rows = conn.execute("SELECT raw_path FROM document WHERE doc_id = ANY(%s)", (made,)).fetchall()
+        conn.execute("DELETE FROM declared_disease WHERE source = 'upload' AND source_ref IN "
+                     "(SELECT source_ref FROM document WHERE doc_id = ANY(%s))", (made,))
         runs = [r[0] for r in conn.execute("SELECT DISTINCT run_id FROM ingest_job WHERE doc_id = ANY(%s)", (made,))]
         conn.execute("DELETE FROM ingest_job WHERE run_id = ANY(%s)", (runs,))
         conn.execute("DELETE FROM ingest_run WHERE run_id = ANY(%s)", (runs,))
@@ -34,9 +37,10 @@ def uploads():
         shutil.rmtree(upload_source.figures_dir(absolute(raw_path)), ignore_errors=True)
 
 
-def post(name: str, data: bytes | None = None, title: str | None = None):
+def post(name: str, data: bytes | None = None, title: str | None = None, codes: list[str] | None = None):
     content = data if data is not None else (FIX / name).read_bytes()
-    return client.post("/documents", files={"file": (name, content)}, data={"title": title} if title else {})
+    form = {"disease_ids": ["OMIM:163950"] if codes is None else codes} | ({"title": title} if title else {})
+    return client.post("/documents", files={"file": (name, content)}, data=form)
 
 
 def work(job_id: int) -> None:
@@ -56,7 +60,7 @@ def test_upload_review_approve(fake_models, uploads):
     view = client.get(f"/documents/{doc_id}").json()
     assert view["document"]["status"] == "PENDING" and "raw_path" not in view["document"]
     assert view["document"]["title"] == "Hướng dẫn siêu âm thai quý một"  # Docling title replaces the file name
-    assert view["document"]["language"] == "vi" and view["document"]["disease_ids"] == []
+    assert view["document"]["language"] == "vi" and view["document"]["disease_ids"] == ["OMIM:163950"]
     assert view["job"]["state"] == "done"
     assert [s["heading_path"] for s in view["sections"]] == [["Đặc điểm lâm sàng"],
                                                               ["Đặc điểm lâm sàng", "Dấu hiệu trước sinh"]]
@@ -106,3 +110,76 @@ def test_rejects_wrong_format_and_unknown_ids():
 def test_too_large(monkeypatch):
     monkeypatch.setitem(upload_source.INGEST, "upload_max_mb", 0)
     assert post("guide_en.pdf").status_code == 413
+
+
+# ---- declared disease codes (docs/evidence-plan.md §6) ------------------------------------------
+def test_upload_requires_known_codes(uploads):
+    content = (FIX / "guide_vi.docx").read_bytes()
+    sha = hashlib.sha256(content).hexdigest()
+    for codes in ([], ["OMIM:0000000"]):
+        r = post("guide_vi.docx", codes=codes)
+        assert r.status_code == 422, r.text
+    with connect() as conn:
+        assert conn.execute("SELECT count(*) FROM document WHERE source = 'upload' AND source_ref = %s AND status <> 'REJECTED'",
+                            (sha,)).fetchone()[0] == 0
+
+
+def test_put_diseases_updates_now_and_queues_rechunk(fake_models, uploads):
+    r = post("guide_vi.docx")
+    doc_id = r.json()["doc_id"]
+    uploads.append(doc_id)
+    assert client.put(f"/documents/{doc_id}/diseases", json={"disease_ids": ["ORPHA:648"]}).status_code == 409  # PROCESSING
+    work(r.json()["job_id"])
+    client.post(f"/documents/{doc_id}/approve")
+    resp = client.put(f"/documents/{doc_id}/diseases", json={"disease_ids": ["ORPHA:648", " ORPHA:648"]})
+    assert resp.status_code == 202 and len(resp.json()["job_ids"]) == 1
+    with connect() as conn:
+        assert {tuple(r[0]) for r in conn.execute("SELECT disease_ids FROM chunk WHERE doc_id = %s", (doc_id,))} \
+            == {("ORPHA:648",)}   # findable at once
+        run_id = conn.execute("SELECT run_id FROM ingest_job WHERE job_id = %s", (resp.json()["job_ids"][0],)).fetchone()[0]
+    worker.work(once=True, run_id=run_id)
+    with connect() as conn:
+        texts = [r[0] for r in conn.execute("SELECT embed_text FROM chunk WHERE doc_id = %s AND embed_text IS NOT NULL",
+                                            (doc_id,))]
+        conn.execute("DELETE FROM ingest_job WHERE run_id = %s", (run_id,))
+        conn.execute("DELETE FROM ingest_run WHERE run_id = %s", (run_id,))
+    assert texts and all("Diseases: Noonan syndrome" in t and "Noonan syndrome 1" not in t for t in texts)
+
+
+def test_put_diseases_conflicts(env, rows):
+    assert client.put("/documents/999999999/diseases", json={"disease_ids": ["ORPHA:648"]}).status_code == 404
+    gr, pmc = rows.doc([]), rows.doc([], source="pmc")
+    rows.conn.commit()
+    assert client.put(f"/documents/{gr}/diseases", json={"disease_ids": ["ORPHA:648"]}).status_code == 409
+    assert client.put(f"/documents/{pmc}/diseases", json={"disease_ids": ["OMIM:0000000"]}).status_code == 422
+    ok = client.put(f"/documents/{pmc}/diseases", json={"disease_ids": ["ORPHA:648"]})
+    assert ok.status_code == 202 and ok.json()["job_ids"] == []   # no chunks yet: nothing to rechunk
+    with connect() as conn:
+        conn.execute("DELETE FROM ingest_run WHERE command = %s", (f"PUT /documents/{pmc}/diseases",))
+
+
+def test_list_documents_filters(rows):
+    pmc, gr = rows.doc([], source="pmc"), rows.doc([])
+    rows.conn.commit()
+    missing = {d["doc_id"] for d in client.get("/documents", params={"missing_codes": "true"}).json()}
+    assert pmc in missing and gr not in missing
+    pmc_rows = client.get("/documents", params={"source": "pmc"}).json()
+    row = next(d for d in pmc_rows if d["doc_id"] == pmc)
+    assert row["source"] == "pmc" and row["disease_ids"] == [] and row["job"] is None
+    assert all(d["source"] == "pmc" for d in pmc_rows)
+
+
+def test_get_diseases():
+    found = client.get("/diseases", params={"q": "Noonan"}).json()
+    assert len(found) <= 10 and "OMIM:163950" in {d["disease_id"] for d in found}
+    assert client.get("/diseases").status_code == 422
+
+
+def test_get_passage(rows):
+    chunk = rows.chunk(rows.doc(["OMIM:163950"], title="Doc"), "Some text.", active=False)
+    rows.conn.commit()
+    got = client.get(f"/passages/{chunk}").json()
+    assert (got["ref"] == f"CHUNK:{chunk}" and got["active"] is False
+            and got["section_path"] == ["Doc", "Clinical Description"])
+    gone = client.get("/passages/999999999")
+    assert gone.status_code == 404 and gone.json()["detail"]["code"] == "passage_not_found"

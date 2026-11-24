@@ -1,0 +1,245 @@
+/* Phenotype review container & summary */
+.findings-count { font-size: 13px; color: var(--text-muted); }
+.findings-carry { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+.phenotype-review-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+
+/* Folded summary: findings already used for the current suggestions */
+.review-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+.review-summary__head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.review-summary__title { flex: 1 1 200px; min-width: 0; font-size: 14px; font-weight: 500; color: var(--text-primary); }
+.review-summary__notes { font-size: 12px; color: var(--info); font-weight: 500; }
+.review-summary__terms { display: flex; flex-wrap: wrap; gap: 6px; }
+.term-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-secondary);
+  font-size: 13px;
+  color: var(--text-primary);
+}
+.term-chip[data-assertion="UNCERTAIN"],
+.term-chip[data-assertion="SUSPECTED"] { background: var(--amber-soft); color: var(--amber); }
+.term-chip[data-assertion="ABSENT"] .term-chip__label { color: var(--text-secondary); text-decoration: line-through; text-decoration-color: var(--text-muted); }
+.term-chip__label { overflow-wrap: anywhere; }
+
+/* Finding list: one row per finding, grouped by status (FindingList.tsx) */
+.finding-list { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+.finding-list__group { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+/* Group title = the anchor of each block: primary text, a status dot in the group's tone, count muted. */
+.finding-list__group-title { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--text-primary); }
+.finding-list__group-title::before { content: ""; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--group-tone, var(--text-muted)); }
+.finding-list__group[data-group="present"] { --group-tone: var(--primary); }
+.finding-list__group[data-group="measure"],
+.finding-list__group[data-group="unsure"],
+.finding-list__group[data-group="attention"] { --group-tone: var(--amber); }
+.finding-list__count { font-weight: 500; color: var(--text-muted); }
+.finding-list__rows { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface); overflow: hidden; }
+.finding-list__rows > li + li { border-top: 1px solid var(--line); }
+.finding-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+  padding: 10px 12px 10px 14px;
+  border: 0;
+  background: transparent;
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+.finding-row:hover { background: var(--surface-hover); }
+.finding-row__main { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.finding-row__name { font-size: 14px; font-weight: 600; line-height: 1.4; overflow-wrap: anywhere; }
+.finding-row[data-group="absent"] .finding-row__name { font-weight: 500; color: var(--text-secondary); }
+.finding-row[data-group="attention"] .finding-row__name { font-weight: 500; font-style: normal; }
+.finding-row__name::first-letter { text-transform: uppercase; }
+.finding-row__value { margin-left: 8px; color: var(--text-secondary); font-weight: 500; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.finding-row__quote { min-width: 0; overflow: hidden; color: var(--text-muted); font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+.finding-row__shared { min-width: 0; color: var(--text-secondary); font-size: 13px; overflow-wrap: anywhere; }
+.finding-row__marks { flex: none; max-width: 40%; color: var(--text-secondary); font-size: 12px; text-align: right; overflow-wrap: anywhere; }
+.finding-row__chevron { display: inline-flex; flex: none; color: var(--text-muted); }
+
+/* Finding dialog body (FindingDialog.tsx) */
+.finding-facts { font-size: 13px; color: var(--text-secondary); overflow-wrap: anywhere; }
+.finding-facts__warn { color: var(--amber); }
+.finding-attention {
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--amber-soft);
+  color: var(--amber);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.finding-definition { font-size: 14px; color: var(--text-primary); line-height: 1.6; overflow-wrap: anywhere; }
+.finding-inline-btn { min-height: 28px; padding: 0 8px; font-size: 13px; }
+.finding-dialog__actions { padding-top: 4px; border-top: 1px solid var(--line); }
+.term-id {
+  padding: 1px 6px;
+  border-radius: var(--radius-xs);
+  background: var(--surface-secondary);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 18px;
+  white-space: nowrap;
+}
+
+/* Source quote: the clinician's own words */
+.source-quote {
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-secondary);
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+.source-quote::before { content: "\201C"; }
+.source-quote::after { content: "\201D"; }
+/* Clinician note & inline editor */
+.clinician-note {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--info-soft);
+  color: var(--text-primary);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.finding-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+.finding-editor__label { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+.finding-editor textarea { width: 100%; font-size: 14px; }
+.finding-editor__grid {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  align-items: center;
+  gap: 8px 12px;
+}
+.finding-editor__grid label { font-size: 13px; color: var(--text-secondary); }
+.finding-editor__grid select { width: 100%; min-width: 0; font-size: 14px; padding: 6px 10px; }
+.finding-editor__check { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 400; color: var(--text-primary); }
+.finding-editor__check input { width: 16px; height: 16px; margin: 0; padding: 0; accent-color: var(--primary); }
+.finding-editor__remap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+  padding: 12px 0 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+}
+.finding-editor__remap legend { padding: 0; font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+.finding-editor__remap input { width: 100%; font-size: 14px; padding: 6px 10px; }
+@media (max-width: 640px) {
+  .finding-editor__grid { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .finding-row__marks { display: none; }
+}
+.editor-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+
+/* Archived notes from prior runs */
+.previous-analysis-notes {
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-secondary);
+  font-size: 13px;
+}
+
+.previous-analysis-notes > summary {
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.archived-note-run {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.archived-description {
+  color: var(--text-secondary);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.archived-finding-note {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xs);
+  background: var(--surface);
+}
+
+.phenotype-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-top: 4px;
+}
+.review-footer-note { width: 100%; text-align: right; font-size: 13px; color: var(--text-secondary); }
+
+.review-footer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.retrieve-btn {
+  min-width: 150px;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .review-footer-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .review-footer-actions > .tooltip-anchor,
+  .review-footer-actions .button,
+  .retrieve-btn {
+    width: 100%;
+  }
+}

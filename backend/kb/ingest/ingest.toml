@@ -15,5 +15,3 @@ visual_query_instruction = "Retrieve images or document pages relevant to the us
 upload_max_mb = 50
 docling_images_scale = 2.0        # T76: figures cut from PDFs at twice the default resolution
 vi_char_ratio = 0.02
-literature_include_undeclared = true
-literature_max_scan_tuples = 1000000   # must exceed the total number of chunks

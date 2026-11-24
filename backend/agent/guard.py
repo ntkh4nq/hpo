@@ -1,7 +1,8 @@
 """Answer check of the supervisor (docs/agent-impl-plan.md task 3; agent-plan §6, T97).
 
-After every supervisor model call: every source code in the text must come from the case summary, a tool result
-or an earlier (already checked) answer (principle #8), and no phrase may turn a score into a risk (principle #2).
+After every supervisor model call: every source code in the text must come from the case summary or from a tool
+result or checked answer of the current turn (principle #8, T128), and no phrase may turn a score into a risk
+(principle #2).
 First failure: the message is removed and the model rewrites once; second failure in a row: a fixed answer.
 """
 
@@ -12,8 +13,7 @@ from collections.abc import Mapping
 from langchain.agents.middleware import AgentMiddleware, hook_config
 from langchain_core.messages import AIMessage, HumanMessage, RemoveMessage
 
-from agent.analysis import GUARD_NAME
-from agent.state import CONFIG, render_case
+from agent.state import CONFIG, GUARD_NAME, is_doctor_message, render_case
 from core.db import connect
 from ranking.index import load_index
 
@@ -35,10 +35,12 @@ def banned_match(text: str) -> str | None:
 
 
 def allowed_codes(state: Mapping) -> set[str]:
-    """Codes in the case summary, in every tool result, and in every earlier supervisor message."""
+    """Codes in the case summary, and in tool results and supervisor messages after the doctor's last message.
+    Earlier turns do not authorize a code: the case may have changed since (T128); the model looks it up again."""
     messages = state["messages"]
+    start = next((i + 1 for i in range(len(messages) - 1, -1, -1) if is_doctor_message(messages[i])), 0)
     texts = [render_case(state)]
-    texts += [m.text for m in messages[:-1] if m.type in ("tool", "ai")]
+    texts += [m.text for m in messages[start:-1] if m.type in ("tool", "ai")]
     return {c for t in texts for c in find_codes(t)}
 
 
@@ -61,6 +63,11 @@ def citations(texts: list[str]) -> list[dict]:
         if kind == "hpo":
             en, vi = index.labels.get(code, (None, None))
             label = vi or en
+        elif kind == "chunk":    # a passage: its document's title (None when the chunk no longer exists)
+            with connect() as conn:
+                row = conn.execute("SELECT d.title FROM chunk c JOIN document d ON d.doc_id = c.doc_id"
+                                   " WHERE c.chunk_id = %s", (int(code.split(":", 1)[1]),)).fetchone()
+            label = row[0] if row else None
         elif kind == "disease":
             label = index.disease_name.get(code)
             if label is None:

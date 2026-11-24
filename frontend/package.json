@@ -1,27 +1,34 @@
 {
-  "name": "frontend",
-  "version": "0.1.0",
+  "name": "phenotype-studio",
   "private": true,
+  "version": "0.1.0",
+  "type": "module",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
+    "dev": "vite --host 127.0.0.1",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "node src/redux/workflow.test.mjs"
   },
   "dependencies": {
-    "next": "16.4.5",
-    "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "@fontsource-variable/inter": "5.2.8",
+    "@reduxjs/toolkit": "2.14.0",
+    "i18next": "26.7.2",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "react-i18next": "17.1.13",
+    "react-redux": "9.3.1",
+    "redux-saga": "1.5.1"
   },
   "devDependencies": {
-    "@tailwindcss/turbopack": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "16.4.5",
-    "tailwindcss": "^4",
-    "typescript": "^5"
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.2.1",
+    "typescript": "7.0.2",
+    "vite": "8.3.6"
+  },
+  "engines": {
+    "node": ">=24.0.0"
   },
   "packageManager": "pnpm@9.15.9"
 }

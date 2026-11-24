@@ -22,7 +22,7 @@ class State(TypedDict):
     text: str
     items: list[Item] | None
     candidates: dict[int, list[Candidate]]
-    gated: set[int]
+    gated: set[int]           # not sent to the choose step: gated by score, or a measurement awaiting the doctor
     choices: ChoiceSet | None
     split_failed: bool
     choose_failed: bool
@@ -44,7 +44,8 @@ def after_split(state: State) -> str:
 
 def find_candidates_node(state: State) -> dict:
     candidates = mapping.find_candidates(state["items"])
-    return {"candidates": candidates, "gated": mapping.gate(candidates, mapping.CONFIG["unmapped_dense_threshold"])}
+    return {"candidates": candidates,
+            "gated": mapping.not_chosen(state["items"], candidates, mapping.CONFIG["unmapped_dense_threshold"])}
 
 
 def choose_terms_node(state: State) -> dict:
@@ -88,12 +89,13 @@ def analyze(text: str) -> Analysis:
 def print_analysis(a: Analysis) -> None:
     for f in a.findings:
         if f.mapping_status == "MAPPED":
-            mapped = f"{f.term.hpo_id} {f.term.label_vi or f.term.label_en}"
+            mapped = f"{f.term.hpo_id} {f.term.label_en}"
         elif f.mapping_status == "AMBIGUOUS":
-            mapped = ", ".join(f"{t.hpo_id} {t.label_vi or t.label_en}" for t in f.options)
+            mapped = ", ".join(f"{t.hpo_id} {t.label_en}" for t in f.options)
         else:
             mapped = "—"
-        print(f"{f.phrase} | {f.source_text} | {f.assertion} | {f.assessment} | {f.subject} | {f.mapping_status} | {mapped}")
+        value = f" [{f.measurement.quantity}: {f.measurement.value}]" if f.measurement else ""
+        print(f"{f.phrase}{value} | {f.source_text} | {f.assertion} | {f.assessment} | {f.subject} | {f.mapping_status} | {mapped}")
     print(f"rejections: {[r.model_dump() for r in a.rejections]}")
     print(f"split_failed: {a.split_failed}  choose_failed: {a.choose_failed}")
 

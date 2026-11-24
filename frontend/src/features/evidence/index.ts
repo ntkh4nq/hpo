@@ -1,0 +1,1 @@
+export { EvidenceModal } from './EvidenceModal';

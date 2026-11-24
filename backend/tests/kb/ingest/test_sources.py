@@ -12,7 +12,7 @@ import pytest
 from core.db import connect
 from kb.ingest.model import REPO_ROOT, Figure, Paragraph, Table
 from kb.ingest.scope import in_scope, known_disease_ids
-from kb.ingest.sources import SOURCES, genereviews, orphanet_def, pmc, pubmed, upload
+from kb.ingest.sources import SOURCES, genereviews, medlineplus, orphanet_def, pmc, pubmed, upload
 
 FIX = Path(__file__).parent / "fixtures"
 GR = FIX / "genereviews/docs/gene_NBK1116/sca20.nxml"
@@ -46,6 +46,24 @@ def test_orphanet_definition_and_exact_omim_only(conn):
 def test_orphanet_list_docs():
     refs = orphanet_def.list_docs(FIX / "orphanet_def")
     assert [r.source_ref for r in refs] == ["ORPHA:648", "ORPHA:166282"]
+
+
+# ---- medlineplus --------------------------------------------------------------------------------
+def test_medlineplus_summary_and_known_omim_only(conn):
+    doc = medlineplus.parse(FIX / "medlineplus/docs/MEDLINEPLUS_21263.xml")
+    assert (doc.source_ref, doc.title, doc.doc_type) == ("MEDLINEPLUS:21263", "Abdominal wall defect", "summary")
+    assert doc.url == "https://medlineplus.gov/genetics/condition/abdominal-wall-defect"
+    assert doc.citation == "MedlinePlus Genetics. Abdominal wall defect. National Library of Medicine."
+    assert doc.license == "MedlinePlus.gov (NLM); credit required"
+    assert paths(doc) == [["Description"]] and len(blocks(doc)) > 1
+    assert blocks(doc)[0].text.startswith("An abdominal wall defect is an opening")
+    # 230750 and 310980 are OMIM keys absent from our disease table: dropped
+    assert medlineplus.declared_disease_ids(doc, conn) == ["OMIM:164750"]
+
+
+def test_medlineplus_list_docs():
+    refs = medlineplus.list_docs(FIX / "medlineplus")
+    assert [r.source_ref for r in refs] == ["MEDLINEPLUS:20351", "MEDLINEPLUS:21263"]
 
 
 # ---- pubmed -------------------------------------------------------------------------------------
@@ -114,13 +132,11 @@ def test_pmc_full_text(conn):
     assert [f.image_path is not None for f in figures] == [False, False, False, False, True]
     skip = {s.casefold() for s in pmc.CFG["skip_sections"]}
     assert not any(h.casefold() in skip for p in paths(doc) for h in p)
-    assert pmc.declared_disease_ids(doc, conn) == []
 
 
 def test_pmc_abstract_fallback(conn):
     doc = pmc.parse(FIX / "pmc/docs/PMID_12634870.xml")
     assert (doc.source, doc.source_ref) == ("pmc", "PMID:12634870")
-    assert pmc.declared_disease_ids(doc, conn) == []  # pmc declares no codes, even for a cited PMID (T75)
     assert [r.source_ref for r in pmc.list_docs(FIX / "pmc")] == ["PMC10568385", "PMID:12634870"]
 
 
@@ -174,6 +190,7 @@ def test_language():
 # ---- determinism (rechunk relies on it, §3) -----------------------------------------------------
 @pytest.mark.parametrize("source,path", [
     ("orphanet_def", FIX / "orphanet_def/docs/ORPHA_648.xml"),
+    ("medlineplus", FIX / "medlineplus/docs/MEDLINEPLUS_20351.xml"),
     ("pubmed", FIX / "pubmed/docs/PMID_32164556.xml"),
     ("genereviews", GR),
     ("pmc", PMC),

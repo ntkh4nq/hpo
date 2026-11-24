@@ -15,6 +15,11 @@ Subject = Literal["FETUS", "MOTHER", "FAMILY"]
 MappingStatus = Literal["MAPPED", "AMBIGUOUS", "UNMAPPED"]
 
 
+class Measurement(BaseModel):          # a measured value of the finding, both parts verbatim from source_text (T117)
+    quantity: str = Field(description="Đại lượng được đo, chép đúng chữ bác sĩ, ví dụ 'độ mờ da gáy'")
+    value: str = Field(description="Con số kèm đơn vị, chép đúng như trong câu nguồn, ví dụ '6,2 mm'")
+
+
 class Item(BaseModel):
     phrase: str = Field(description="Cụm tự đủ nghĩa nêu một biểu hiện, dùng đúng chữ bác sĩ, không chứa chữ kết luận")
     source_text: str = Field(description="Câu trong mô tả chứa biểu hiện, chép nguyên văn từng chữ")
@@ -22,6 +27,7 @@ class Item(BaseModel):
     assessment: Assessment
     temporality: str | None = Field(description="Tuổi thai lúc quan sát nếu mô tả có nêu, ví dụ '22 tuần'")
     subject: Subject
+    measurement: Measurement | None = Field(default=None, description="Số đo của chính biểu hiện này nếu câu nguồn có; không có thì để trống")
 
 
 class Split(BaseModel):
@@ -40,9 +46,7 @@ class Candidate(BaseModel):            # one search_hpo result shown to the choo
 
 class Term(BaseModel):                 # a chosen HPO term; values copied from its Candidate, never from model output
     hpo_id: str
-    label_en: str
-    label_vi: str | None
-    label_vi_reviewed: bool
+    label_en: str                      # the only name shown: no Vietnamese term name is displayed (T120)
     definition_en: str | None
 
 
@@ -54,6 +58,7 @@ class Finding(BaseModel):              # one row of the Internal Phenotype Profi
     assessment: Assessment
     temporality: str | None
     subject: Subject
+    measurement: Measurement | None = None   # checked verbatim against source_text (T117)
     mapping_status: MappingStatus
     term: Term | None = None           # MAPPED only
     options: list[Term] = []           # AMBIGUOUS only, >= 2

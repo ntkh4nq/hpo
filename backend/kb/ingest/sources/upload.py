@@ -1,7 +1,8 @@
 """User uploads: PDF with a text layer or DOCX, read with Docling (docs/ingestion-plan.md §10, Appendix C.2).
 
 Docling runs with its defaults except: no OCR, keep picture images, images at `docling_images_scale` (T65, T76).
-Uploads declare no disease codes (T75).
+Uploads declare no disease codes (T75): the admin gives them with the upload (table declared_disease,
+docs/evidence-plan.md §6) and the pipeline reads them from there.
 """
 
 import unicodedata
@@ -11,7 +12,7 @@ from pathlib import Path
 from kb.ingest.config import INGEST, SOURCE_SETTINGS
 from kb.ingest.model import Block, Figure, Paragraph, ParsedDocument, PermanentIngestError, Section, Table, rel
 
-DECLARES_CODES = False  # no codes declared: never filtered by scope (T75)
+DECLARES_CODES = False  # codes come from declared_disease; never filtered by scope (T75, evidence-plan §6)
 CFG = SOURCE_SETTINGS["upload"]
 VI_LETTERS = set(unicodedata.normalize("NFC", "àáảãạăằắẳẵặâầấẩẫậđèéẻẽẹêềếểễệìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵ"))
 VI_LETTERS |= {c.upper() for c in VI_LETTERS}
@@ -110,7 +111,3 @@ def parse(raw_path: Path) -> ParsedDocument:
         source="upload", source_ref=raw_path.stem, title=title or raw_path.stem, citation=None, url=None,
         license=CFG["license"], language=language(all_text), doc_type="upload", raw_path=rel(raw_path),
         sections=sections)
-
-
-def declared_disease_ids(doc: ParsedDocument, conn) -> list[str]:
-    return []

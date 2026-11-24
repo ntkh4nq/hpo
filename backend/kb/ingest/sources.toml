@@ -42,3 +42,10 @@ skip_sections = ["References", "Literature Cited", "Chapter Notes", "Author Note
 [upload]
 license = "uploaded by user"
 dir = "data/uploads"
+
+[medlineplus]
+url = "https://medlineplus.gov/download/ghr-summaries.xml"
+license = "MedlinePlus.gov (NLM); credit required"
+# XML namespace of ghr-summaries.xml; it carries the XSD date, so update it when a new download has another root namespace
+namespace = "https://medlineplus.gov/download/ghr-summaries-20250602.xsd"
+

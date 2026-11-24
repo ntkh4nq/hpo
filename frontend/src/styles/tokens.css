@@ -1,0 +1,87 @@
+/* Design tokens — warm neutral palette with one calm accent (Claude/ChatGPT-like, T108). Colours live only here. */
+:root {
+  color-scheme: light;
+  /* Warm neutrals in the spirit of Claude / ChatGPT: low contrast surfaces, one calm accent used sparingly. */
+  --background: #faf9f6;
+  --surface: #ffffff;
+  --surface-sidebar: #f3f2ee;
+  --surface-secondary: #f4f3ef;
+  --surface-hover: #ecebe6;
+  --surface-user: #efede8;
+  --scrim: rgb(28 27 24 / 0.32);
+
+  --text-primary: #2b2a27;
+  --text-secondary: #57554f;
+  --text-muted: #8a877f;
+  --line: #ebe9e3;
+  --border-default: #dedbd3;
+
+  --primary: #3f7f76;
+  --primary-dark: #336a62;
+  --primary-soft: #e7f0ee;
+  --on-primary: #ffffff;
+  --info: #43698f;
+  --info-soft: #ecf1f6;
+  --amber: #8d6a28;
+  --amber-soft: #f6efdf;
+  --rose: #a6534b;
+  --rose-soft: #f7ebe8;
+  --strong: #2b2a27;
+  --strong-hover: #45433f;
+  --on-strong: #ffffff;
+
+  --shadow-sm: 0 1px 2px rgb(28 27 24 / 0.04);
+  --shadow-md: 0 1px 2px rgb(28 27 24 / 0.04), 0 6px 20px rgb(28 27 24 / 0.06);
+  --shadow-lg: 0 12px 36px rgb(28 27 24 / 0.12);
+
+  --radius: 18px;
+  --radius-lg: 24px;
+  --radius-sm: 12px;
+  --radius-xs: 8px;
+  --radius-pill: 999px;
+
+  --header-height: 56px;
+  --rail-width: 56px;
+  --drawer-width: 272px;
+  --thread-width: 768px;
+
+  --transition-fast: 0.15s cubic-bezier(0.2, 0, 0, 1);
+  --transition-smooth: 0.2s cubic-bezier(0.2, 0, 0, 1);
+  --font: "Inter Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --background: #262624;
+  --surface: #30302e;
+  --surface-sidebar: #1f1e1d;
+  --surface-secondary: #2c2c2a;
+  --surface-hover: #3a3936;
+  --surface-user: #393937;
+  --scrim: rgb(0 0 0 / 0.5);
+
+  --text-primary: #ebe9e4;
+  --text-secondary: #bdbab2;
+  --text-muted: #8f8c85;
+  --line: #3a3a37;
+  --border-default: #4a4945;
+
+  --primary: #79b3a9;
+  --primary-dark: #94c6bd;
+  --primary-soft: rgb(121 179 169 / 0.14);
+  --on-primary: #1f2422;
+  --info: #9db8d6;
+  --info-soft: rgb(157 184 214 / 0.12);
+  --amber: #d8b778;
+  --amber-soft: rgb(216 183 120 / 0.13);
+  --rose: #df9a90;
+  --rose-soft: rgb(223 154 144 / 0.13);
+  --strong: #ebe9e4;
+  --strong-hover: #ffffff;
+  --on-strong: #262624;
+
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.18);
+  --shadow-md: 0 1px 2px rgb(0 0 0 / 0.18), 0 6px 20px rgb(0 0 0 / 0.22);
+  --shadow-lg: 0 12px 36px rgb(0 0 0 / 0.4);
+}

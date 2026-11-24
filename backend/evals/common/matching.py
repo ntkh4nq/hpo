@@ -36,3 +36,13 @@ def match(gold: list[dict], pred: list[dict], threshold: float) -> list[tuple[in
             used_p.add(pi)
             pairs.append((gi, pi, sim))
     return pairs
+
+
+def measurement_ok(gold: dict, pred: dict) -> bool | None:
+    """For a paired item whose gold has a measurement (T119): the model's value equals it, whitespace aside.
+    None when the gold item has no measurement (not scored)."""
+    g = gold.get("measurement")
+    if not g:
+        return None
+    p = pred.get("measurement") or {}
+    return " ".join(str(p.get("value", "")).split()) == " ".join(g["value"].split())

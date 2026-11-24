@@ -8,7 +8,7 @@ from langgraph.types import Command
 
 from agent.graph import build_graph
 from agent.state import ReviewDecision
-from agent.tools import EXCLUDED_REASON, case_ranking
+from agent.tools import case_ranking
 from ranking.schema import Ranking
 from tests.fakes import FakeChat, call, cand, fake_phase3, item, row, seed_case
 
@@ -65,12 +65,22 @@ def test_notes_only_does_not_rerank():
     assert act(graph, notes={"f2": "đo lại chỉ số ối"})["ranking"] == before
 
 
+def test_case_event_only_when_the_ranking_changed():
+    """T128: a re-rank tells the next supervisor turn that earlier answers describe the old list."""
+    graph, _ = seeded()
+    events = lambda values: [m for m in values.get("messages", []) if m.type == "human" and m.name == "case_event"]
+    assert events(act(graph, notes={"f2": "ghi chú"})) == []
+    values = act(graph, edits=[{"finding_id": "f1", "assertion": "SUSPECTED"}])
+    assert len(events(values)) == 1 and "Ca hiện tại" in events(values)[0].text
+    assert len(events(act(graph, edits=[{"finding_id": "f1", "assertion": "SUSPECTED"}], notes={"f2": "x"}))) == 1
+
+
 def test_skipped_have_finding_ids():
     graph, _ = seeded()
     values = act(graph, edits=[{"finding_id": "f1", "excluded": True}])
     skipped = Ranking.model_validate(values["ranking"]).skipped
     assert [(s.finding_id, s.reason) for s in skipped] == [
-        ("f1", EXCLUDED_REASON), ("f3", "không phải của thai"), ("f4", "chưa ánh xạ được")]
+        ("f1", "excluded_by_doctor"), ("f3", "not_fetal"), ("f4", "unmapped")]
 
 
 def test_full_turn_with_review(monkeypatch):
