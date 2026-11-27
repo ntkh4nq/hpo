@@ -393,3 +393,93 @@ def test_remap_can_carry_the_doctors_conclusion(use):
                              json={"action": "remap", "finding_id": "f1", "phrase": "đa ối", "assertion": "SUSPECTED"}))
     f1 = of(evs, "review")[0]["findings"][0]
     assert (f1["phrase"], f1["assertion"], f1["machine"]["assertion"]) == ("đa ối", "SUSPECTED", "PRESENT")
+
+
+def expire(case_id: str) -> None:
+    """What the Redis TTL does: the case's checkpoint is gone; Postgres keeps the case data and turns (T139)."""
+    app.state.graph.checkpointer.delete_thread(case_id)
+
+
+def kept_case(use, *script) -> tuple[str, FakeChat]:
+    """An analysed case with one finished turn, its data saved in Postgres as a turn leaves it, then expired."""
+    case_id, _ = seeded_case(use)
+    model = use(*script)   # a new graph on a new InMemorySaver, as after the checkpoint expired
+    state = seed_case([row("f1", "thông liên thất", VSD, candidates=[cand(VSD, "VSD"), cand(ASD, "ASD")]),
+                       row("f2", "đa ối", POLY)])
+    state["ranking"] = case_ranking(state).model_dump(mode="json")
+    case_store.save_state(case_id, state)
+    turn_no = case_store.start_turn(case_id, "message", {"text": "Thai có thông liên thất, đa ối."})
+    case_store.finish_turn(case_id, turn_no, [{"kind": "text", "message_id": "m1", "text": "Đã ghi 2 biểu hiện."}],
+                           "done", [])
+    return case_id, model
+
+
+def test_expired_case_view_comes_from_postgres(use):
+    case_id, _ = kept_case(use)
+    got = client.get(f"/cases/{case_id}").json()
+    assert got["status"] == "idle" and not got["review_expired"]
+    assert [f["finding_id"] for f in got["findings"]] == ["f1", "f2"] and got["ranking"]["suggestions"]
+    assert [m["role"] for m in got["messages"]] == ["user", "assistant"]
+
+
+def test_expired_case_message_rebuilds_thread(use):
+    case_id, model = kept_case(use, AIMessage("Vẫn là thông liên thất."))
+    evs = events(client.post(f"/cases/{case_id}/messages", json={"text": "Còn gì nữa?"}))
+    assert evs[-1][0] == "done"
+    seen = model.seen[-1]
+    assert [(m.type, m.text) for m in seen if m.type in ("human", "ai")] == [
+        ("human", "Thai có thông liên thất, đa ối."), ("ai", "Đã ghi 2 biểu hiện."), ("human", "Còn gì nữa?")]
+    assert "thông liên thất" in seen[0].text   # the case summary in the system prompt (render_case)
+    values = app.state.graph.get_state(cases.config(case_id)).values
+    assert values["ranking"] and [r["finding_id"] for r in values["findings"]] == ["f1", "f2"]
+
+
+def test_expired_case_findings_rerank(use):
+    case_id, model = kept_case(use)
+    before = client.get(f"/cases/{case_id}").json()["ranking"]
+    view = client.post(f"/cases/{case_id}/findings", json={"edits": [{"finding_id": "f2", "excluded": True}]}).json()
+    assert view["ranking"] != before and view["findings"][1]["excluded"] and model.seen == []
+    assert case_store.get_state(case_id)["edits"] == {"f2": {"finding_id": "f2", "excluded": True}}
+
+
+def test_expired_review(use):
+    case_id, _ = start_review(use)
+    expire(case_id)
+    got = client.get(f"/cases/{case_id}").json()
+    assert got["status"] == "idle" and got["review_expired"]
+    resp = client.post(f"/cases/{case_id}/review", json={"action": "continue"})
+    assert resp.status_code == 409 and resp.json()["detail"]["code"] == "review_expired"
+
+
+def test_turn_saves_case_data(use):
+    case_id, _ = start_review(use, AIMessage("Xong."))
+    events(client.post(f"/cases/{case_id}/review", json={"action": "continue"}))
+    saved = case_store.get_state(case_id)
+    assert [r["finding_id"] for r in saved["findings"]] == ["f1", "f2"] and saved["ranking"]
+    assert "messages" not in saved and "todos" not in saved
+
+
+def test_case_list_reads_postgres_only(use):
+    case_id, _ = start_review(use)
+    app.state.graph = None   # listing must not touch the checkpointer: it would refresh every TTL (T139)
+    status = {c["case_id"]: c["status"] for c in client.get("/cases").json()}
+    assert status[case_id] == "review"
+
+
+def test_replayed_answer_streams(use, tmp_path):
+    """LLM_CACHE (core/llm_cache.py): the same model input on a new case is answered from the cache, with no model
+    call, and the answer still reaches the SSE stream."""
+    from langchain_core.globals import set_llm_cache
+
+    from core.llm_cache import SQLiteCache
+    set_llm_cache(SQLiteCache(tmp_path / "llm.sqlite"))
+    try:
+        model = use(AIMessage("Chào bác sĩ."))   # one scripted answer: a second model call would fail the turn
+        texts = []
+        for _ in range(2):
+            evs = events(client.post("/cases", json={"text": "Chào"}))
+            assert evs[-1][0] == "done", evs[-1]
+            texts.append("".join(d["delta"] for d in of(evs, "text")))
+        assert texts == ["Chào bác sĩ.", "Chào bác sĩ."] and len(model.seen) == 1
+    finally:
+        set_llm_cache(None)

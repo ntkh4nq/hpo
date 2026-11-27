@@ -2,7 +2,8 @@
 
 The case keeps the machine's findings as phase 3 produced them, plus the doctor's remaps, edits and notes
 side by side (T91). `effective_findings` combines them; the machine's values are never overwritten, so every
-change stays traceable (principle #6). Every key holds JSON only: the state is checkpointed in Postgres (T116).
+change stays traceable (principle #6). Every key holds JSON only: the state is checkpointed in Redis and the
+SAVED_KEYS are kept in Postgres (T139).
 """
 
 import tomllib
@@ -84,6 +85,13 @@ class CaseState(DeepAgentState, total=False):   # DeepAgentState keeps the messa
     ranking: dict | None      # Ranking.model_dump(mode="json") of the current effective findings
     pending_action: dict | None   # card action input; cleared by apply_findings_action
     notes_archive: list[dict]  # [{description, findings: [FindingView json with a note]}] of replaced analyses (T116)
+
+
+# The case data kept in Postgres (case_record.state) after every turn; the Redis checkpoint is rebuilt from it plus
+# case_turn (T139). Not kept: messages (rebuilt from case_turn), pending_action (empty once a turn ends), and the
+# per-turn keys of Deep Agents (todos, files).
+SAVED_KEYS = ("description", "hpo_release", "findings", "analysis_flags", "remaps", "edits", "notes", "ranking",
+              "notes_archive")
 
 
 def finding_rows(analysis: Analysis) -> list[dict]:

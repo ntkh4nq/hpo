@@ -1,22 +1,19 @@
-"""Real Postgres checkpointer (T116; was Redis, T92): a paused case resumes on a new saver and pool, as after an API
-restart. Uses a test thread id and deletes it afterwards."""
+"""Real Redis checkpointer (T139, core/redis_saver.py): a paused case resumes on a new saver, as after an API restart;
+the fast history read equals the default one. Uses test thread ids and deletes them afterwards."""
 
 import asyncio
 import os
 import uuid
 
 from langchain_core.messages import AIMessage, HumanMessage
-from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
+from langgraph.checkpoint.base import BaseCheckpointSaver
 from langgraph.types import Command
-from psycopg.rows import dict_row
-from psycopg_pool import AsyncConnectionPool
 
 import pytest
 
 from agent.graph import build_graph
+from core.redis_saver import RedisSaver
 from tests.fakes import FakeChat, call, cand, fake_phase3, item
-
-KWARGS = {"autocommit": True, "prepare_threshold": 0, "row_factory": dict_row}
 
 
 @pytest.fixture
@@ -26,9 +23,7 @@ def phase3(monkeypatch):
 
 
 async def _with_saver(fn):
-    async with AsyncConnectionPool(os.environ["DATABASE_URL"], kwargs=KWARGS, open=False) as pool:
-        saver = AsyncPostgresSaver(pool)
-        await saver.setup()
+    async with RedisSaver.from_conn_string(os.environ["REDIS_URL"]) as saver:
         return await fn(saver)
 
 
@@ -58,3 +53,27 @@ def test_resume_with_new_saver_instance(phase3):
         assert phase3.calls["split"] == 1
     finally:
         assert not asyncio.run(_with_saver(delete))
+
+
+def test_fast_delta_history_equals_default():
+    """core/redis_saver.py reads DeltaChannel history in a few round trips; it must return what the default
+    parent-chain walk of BaseCheckpointSaver returns (messages snapshot only every 50 updates, files never written)."""
+    case_id = str(uuid.uuid4())
+    cfg = {"configurable": {"thread_id": case_id}}
+
+    async def run(saver):
+        for i in range(3):
+            graph = build_graph(saver, FakeChat(messages=iter([AIMessage(f"answer {i}")])))
+            await graph.ainvoke({"messages": [HumanMessage(f"question {i}")]}, cfg)
+        tup = await saver.aget_tuple({"configurable": {"thread_id": case_id, "checkpoint_ns": ""}})
+        args = {"config": tup.config, "channels": ["messages", "files"]}
+        fast = await saver.aget_delta_channel_history(**args)
+        slow = await BaseCheckpointSaver.aget_delta_channel_history(saver, **args)
+        await saver.adelete_thread(case_id)
+        return fast, slow
+
+    def norm(history):
+        return {ch: ([(w[0], w[1], repr(w[2])) for w in h["writes"]], repr(h.get("seed"))) for ch, h in history.items()}
+
+    fast, slow = asyncio.run(_with_saver(run))
+    assert len(fast["messages"]["writes"]) >= 6 and norm(fast) == norm(slow)

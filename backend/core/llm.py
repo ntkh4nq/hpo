@@ -10,21 +10,28 @@ import os
 import tomllib
 from pathlib import Path
 
+from langchain_core.globals import set_llm_cache
 from langchain_core.messages import HumanMessage
 from langchain_openai import ChatOpenAI
 from langfuse.langchain import CallbackHandler
 from pydantic import BaseModel
 
 from core.image import data_url
+from core.llm_cache import SQLiteCache
+
+if os.environ.get("LLM_CACHE"):   # test runs only: replay recorded answers (core/llm_cache.py)
+    set_llm_cache(SQLiteCache(os.environ["LLM_CACHE"]))
 
 MODEL_PARAMS = tomllib.loads((Path(__file__).with_name("llm_models.toml")).read_text())
 ATTEMPTS = 2  # one retry on any failure: connection, timeout, schema (plan.md phase 3, step 2)
 JSON_INSTRUCTION = "\n\n# Định dạng trả lời\nChỉ trả một JSON đúng schema sau, không kèm chữ nào khác:\n"
 
 
-def chat(model: str | None = None, timeout: float = 120, thinking: bool = False) -> ChatOpenAI:
+def chat(model: str | None = None, timeout: float = 120, thinking: bool = False, name: str | None = None) -> ChatOpenAI:
+    """`name` is the step the call serves (split, choose_terms, supervisor, ...): it names the Langfuse generation."""
     model = model or os.environ["LLM_MODEL"]
     return ChatOpenAI(
+        name=name,
         base_url=os.environ["LLM_BASE_URL"],
         api_key=os.environ["LLM_API_KEY"],
         model=model,
@@ -42,17 +49,18 @@ def parse_json(text: str, schema: type[BaseModel]) -> BaseModel:
 
 
 def invoke_json(system: str, human: str, schema: type[BaseModel], *, thinking: bool,
-                timeout: float, model: str | None = None, usage: dict | None = None) -> BaseModel | None:
+                timeout: float, model: str | None = None, usage: dict | None = None,
+                name: str | None = None) -> BaseModel | None:
     """One request (plus one retry) returning `schema`, or None when both attempts failed.
 
     `usage`, when given, accumulates {"requests", "input_tokens", "output_tokens"} over the attempts made.
     """
     if thinking:
-        llm = chat(model, thinking=True, timeout=timeout)
+        llm = chat(model, thinking=True, timeout=timeout, name=name)
         system += JSON_INSTRUCTION + json.dumps(schema.model_json_schema(), ensure_ascii=False)
     else:
         # include_raw: the reply's token usage; a schema error comes back as parsing_error instead of raising (T82)
-        llm = chat(model, timeout=timeout).with_structured_output(schema, method="function_calling", include_raw=True)
+        llm = chat(model, timeout=timeout, name=name).with_structured_output(schema, method="function_calling", include_raw=True)
     messages = [("system", system), ("human", human)]
     for _ in range(ATTEMPTS):
         if usage is not None:
@@ -77,9 +85,9 @@ def invoke_json(system: str, human: str, schema: type[BaseModel], *, thinking: b
     return None
 
 
-def describe_image(image_path, prompt: str, *, model: str, timeout: float) -> str | None:
+def describe_image(image_path, prompt: str, *, model: str, timeout: float, name: str | None = None) -> str | None:
     """One image + instruction to a vision chat model (thinking off); None when every attempt failed."""
-    llm = chat(model, timeout=timeout)
+    llm = chat(model, timeout=timeout, name=name)
     message = HumanMessage(content=[{"type": "text", "text": prompt},
                                     {"type": "image_url", "image_url": {"url": data_url(image_path)}}])
     for _ in range(ATTEMPTS):

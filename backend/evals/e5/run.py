@@ -23,6 +23,7 @@ from pathlib import Path
 from langfuse import Evaluation, get_client
 from pydantic import BaseModel
 
+from evals.common import langfuse_run as lr  # first: sends this process's traces to env 'eval'
 from agent.state import CONFIG as AGENT_CONFIG
 from core.db import connect
 from core.llm import invoke_json
@@ -87,7 +88,7 @@ def _judge_batch(row: dict, batch: list[dict]) -> dict[str, bool]:
     human = (f"Disease: {row['disease_name']} ({row['disease_id']})\nPhenotype: {row['hpo_label']} ({row['hpo_id']})\n\n"
              + "\n\n".join(f"[{i + 1}] {h['display_text']}" for i, h in enumerate(batch)))
     out = invoke_json(JUDGE_PROMPT, human, Judgements, thinking=False, timeout=CONFIG["judge_timeout"],
-                      model=CONFIG["judge_model"])
+                      model=CONFIG["judge_model"], name="judge_e5_supports")
     if out is None:
         return {}
     by_index = {j.index: j.supports for j in out.judgements}
@@ -246,7 +247,6 @@ def report(record: dict, rows: list[dict]) -> dict:
 def log_langfuse(record: dict, rows: list[dict], path: Path) -> None:
     items = [i for i in get_client().get_dataset(LANGFUSE_DATASET).items
              if i.status != "ARCHIVED" and (i.metadata or {}).get("split") == record["split"]]
-    date = record["created_at"].replace(":", "")   # with the time: two runs of one day must not share a name
     for run in record["runs"]:
         scored, summ = score(run, record["judgements"]), summary(score(run, record["judgements"]), rows)
 
@@ -266,10 +266,11 @@ def log_langfuse(record: dict, rows: list[dict], path: Path) -> None:
 
         c = run["config"]
         get_client().run_experiment(
-            name="E5 literature search", run_name=f"e5-{record['split']}-{config_name(c)}-{date}",
-            description=f"saved output {path.name}", data=items, task=task, evaluators=[item_evaluator],
+            name=lr.experiment("E5"), run_name=lr.run_name("E5", record["split"], config_name(c), path, record["git"]),
+            description=lr.description(f"find_passages with {config_name(c)}.", path), data=items, task=task,
+            evaluators=[item_evaluator],
             run_evaluators=[run_evaluator], max_concurrency=16,
-            metadata={**c, "split": record["split"], "git": record["git"], "judge": record["judge_prompt_version"]})
+            metadata=lr.metadata("E5", record["split"], path, record["git"], judge=record["judge_prompt_version"], **c))
     get_client().flush()
 
 

@@ -36,7 +36,8 @@ def case_prompt(request: ModelRequest) -> str:
 
 def build_supervisor(model: BaseChatModel | None = None):
     # Thinking off for tool turns (T22); stream_usage so streamed calls still report tokens to Langfuse (T99).
-    model = model or chat(CONFIG["supervisor_model"], thinking=False).model_copy(update={"stream_usage": True})
+    model = model or chat(CONFIG["supervisor_model"], thinking=False).model_copy(
+        update={"stream_usage": True, "name": "supervisor"})
     return create_deep_agent(
         model=model, tools=TOOLS, subagents=SUBAGENTS, system_prompt=SUPERVISOR_PROMPT,
         middleware=[TodoListMiddleware(system_prompt=TODOS_PROMPT), case_prompt, AnswerGuardMiddleware(),

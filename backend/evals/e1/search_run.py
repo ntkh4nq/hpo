@@ -12,13 +12,13 @@ Selection rule: docs/retrieval-plan.md §6, then docs/eval-strategy.md §6.
 """
 
 import argparse
-import json
 import statistics
 import subprocess
 import time
 
 from langfuse import Evaluation, get_client
 
+from evals.common import langfuse_run as lr  # first: sends this process's traces to env 'eval'
 from evals.e1.dataset import DATASET
 from evals.common.stats import bootstrap_ci, paired_bootstrap_diff
 from core.db import connect
@@ -99,16 +99,16 @@ def main(split: str, profiles: list[str]) -> None:
     hits: dict[str, dict[str, float]] = {}
     for profile in profiles:
         result = langfuse.run_experiment(
-            name="E1 phrase -> HPO",
-            run_name=f"{profile} [{split}] @ {version}",
-            description=f"search_hpo with profile {profile}, E1-{split}",
+            name=lr.experiment("E1-search"),
+            run_name=lr.run_name("E1-search", split, profile, None, version),
+            description=lr.description(f"search_hpo with profile {profile} on E1-{split}.", None),
             data=items,
             task=make_task(profile),
             evaluators=[make_item_evaluator(near)],
             run_evaluators=[summary],
             max_concurrency=4,
-            metadata={"profile": profile, "profile_config": json.dumps(load_profile(profile)),
-                      "git": version, "hpo_release": release, "k": str(K), "split": split},
+            metadata=lr.metadata("E1-search", split, None, version, profile=profile,
+                                 profile_config=load_profile(profile), hpo_release=release, k=str(K)),
         )
         scores = {e.name: e.value for e in result.run_evaluations}
         print(f"{profile:24} " + "  ".join(

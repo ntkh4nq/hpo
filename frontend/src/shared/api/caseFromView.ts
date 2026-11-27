@@ -41,7 +41,9 @@ export function snapshotFromView(view: CaseView): CaseSnapshot {
   const summaryCurrent = Boolean(summaryTurn) && !turns.some(t => t.route === 'findings' && t.turn_no > summaryTurn!.turn_no && t.input.ranking_changed);
 
   // The server's description: a chat message is added to it rather than replacing it (T137).
-  const description = view.description ?? descriptionTurn?.input.text ?? '';
+  // An expired review (T139) of a text from the description box: give that text back so it can be sent again.
+  const expiredText = view.review_expired && descriptionTurn?.input.whole_description === true ? descriptionTurn.input.text : undefined;
+  const description = expiredText ?? view.description ?? descriptionTurn?.input.text ?? '';
   const analysisRun = descriptionTurn ? { id: `${id}:${descriptionTurn.turn_no}`, description, completed: descriptionTurn.outcome === 'review' || descriptionTurn.outcome === 'done' } : null;
   const meta = { analysisId: analysisRun?.id ?? id, description };
   let result = view.ranking ? toResult(view.ranking, findings, meta) : summaryTurn ? emptyResult(findings, meta, view.hpo_release) : null;
@@ -59,7 +61,8 @@ export function snapshotFromView(view: CaseView): CaseSnapshot {
   });
 
   let notice: Notice = null;
-  if (view.analysis_flags?.split_failed) notice = 'splitFailed';
+  if (view.review_expired) notice = 'reviewExpired';
+  else if (view.analysis_flags?.split_failed) notice = 'splitFailed';
   else if (descriptionTurn?.outcome === 'done' && !findings.length) notice = 'notAnalyzed';
   else if (descriptionTurn?.outcome === 'review' && !findings.length) notice = 'noFindings';
 
@@ -68,7 +71,7 @@ export function snapshotFromView(view: CaseView): CaseSnapshot {
     findings, analysisRun, hasAnalyzed: Boolean(descriptionTurn), result, notice,
     edits: editsFromFindings(findings), chat, reviewPending: view.status === 'review',
     // A review that is no longer pending was resolved: "Chờ bác sĩ xem biểu hiện" reads as done (T134 (5)).
-    reviewProgress: progressTurn ? (view.status === 'review' ? turnItems(progressTurn) : reviewResolved(turnItems(progressTurn))) : [],
+    reviewProgress: progressTurn ? (view.status === 'review' || view.review_expired ? turnItems(progressTurn) : reviewResolved(turnItems(progressTurn))) : [],
     notesArchive: (view.notes_archive ?? []).map((entry, index) => ({ analysisId: `${id}:archive:${index}`, description: entry.description, findings: entry.findings.map(toFinding) })),
   };
 }

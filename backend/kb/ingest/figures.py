@@ -40,7 +40,8 @@ def describe(conn, image_path: str) -> str | None:
                        " AND prompt_version = %s", (sha, model, PROMPT_VERSION)).fetchone()
     if row:
         return row[0]
-    text = describe_image(absolute(image_path), PROMPT, model=model, timeout=INGEST["figure_timeout"])
+    text = describe_image(absolute(image_path), PROMPT, model=model, timeout=INGEST["figure_timeout"],
+                          name="figure_description")
     if text:
         conn.execute("INSERT INTO figure_description (image_sha256, model, prompt_version, description)"
                      " VALUES (%s, %s, %s, %s) ON CONFLICT DO NOTHING", (sha, model, PROMPT_VERSION, text))

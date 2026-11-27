@@ -6,6 +6,7 @@ that item's candidates and a current KB term (principle #8); Term values come fr
 model output.
 """
 
+import contextvars
 import hashlib
 import tomllib
 from concurrent.futures import ThreadPoolExecutor
@@ -43,8 +44,12 @@ def query_of(item: Item) -> str:
 
 def find_candidates(items: list[Item]) -> dict[int, list[Candidate]]:
     """item index -> its search_hpo results (default profile), with definition and reviewed-name flag from the KB."""
+    # One copied context per search: the worker's spans then nest under the caller's trace instead of starting
+    # traces of their own (a context can be entered by one thread at a time, hence one copy per call).
+    contexts = [contextvars.copy_context() for _ in items]
     with ThreadPoolExecutor(CONFIG["search_concurrency"]) as pool:
-        found = list(pool.map(lambda item: search_hpo(query_of(item), k=CONFIG["candidates_k"]), items))
+        found = list(pool.map(lambda item, ctx: ctx.run(search_hpo, query_of(item), k=CONFIG["candidates_k"]),
+                              items, contexts))
     ids = sorted({c["hpo_id"] for results in found for c in results})
     with connect() as conn:
         extra = {h: (d, r) for h, d, r in conn.execute(
@@ -97,7 +102,8 @@ def choose_terms(text: str, items: list[Item], candidates: dict[int, list[Candid
         return None, False
     thinking = CONFIG["thinking"] if thinking is None else thinking
     choices = invoke_json(PROMPT, human_message(text, items, candidates, gated), ChoiceSet,
-                          thinking=thinking, timeout=CONFIG["timeout"], model=model or CONFIG["model"])
+                          thinking=thinking, timeout=CONFIG["timeout"], model=model or CONFIG["model"],
+                          name="choose_terms")
     return (None, True) if choices is None else (choices, False)
 
 

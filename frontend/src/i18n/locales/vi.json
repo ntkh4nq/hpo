@@ -194,6 +194,7 @@
   "evidence.gone": "Đoạn này không còn trong kho tài liệu.",
   "evidence.inactive": "Đoạn này hiện không còn được dùng trong kho tài liệu.",
   "notice.caseExpired": "Ca này không còn trên máy chủ (đã bị xóa).",
+  "notice.reviewExpired": "Phiên xem biểu hiện đã hết hạn; gửi lại mô tả để phân tích lại.",
   "notice.notAnalyzed": "Tin nhắn này không được đọc thành biểu hiện; câu trả lời nằm ngay bên dưới.",
   "notice.splitFailed": "Mô tả chưa được phân tích (lỗi bước tách). Hãy thử phân tích lại.",
   "error.caseBusy": "Ca đang xử lý một yêu cầu khác. Thử lại sau giây lát.",

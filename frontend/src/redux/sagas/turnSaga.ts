@@ -16,6 +16,7 @@ export function errorKey(error: unknown): { error: string; errorMessage: string 
   if (error instanceof ApiError) {
     if (error.code === 'case_busy') return { error: 'error.caseBusy', errorMessage: null };
     if (error.code === 'case_waiting_review') return { error: 'error.waitingReview', errorMessage: null };
+    if (error.code === 'review_expired') return { error: 'notice.reviewExpired', errorMessage: null };
     if (error.status === 422) return { error: 'error.invalid', errorMessage: error.message };
   }
   return { error: 'common.error', errorMessage: null };

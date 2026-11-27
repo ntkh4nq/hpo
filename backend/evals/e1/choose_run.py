@@ -26,6 +26,7 @@ from pathlib import Path
 
 from langfuse import Evaluation, get_client
 
+from evals.common import langfuse_run as lr  # first: sends this process's traces to env 'eval'
 from evals.e1.dataset import DATASET
 from evals.common.provenance import git_version
 from evals.common.tree import neighbours
@@ -190,13 +191,13 @@ def report(side: str, record: dict, path: Path, threshold: float, near: dict[str
         return out
 
     result = get_client().run_experiment(
-        name="E1 choose term",
-        run_name=f"choose [{side}] t={threshold} prompt {record['prompt_version']} @ {record['git']}",
-        description=f"steps 3-5 on E1-{side}, saved output {path.name}, gate applied at {threshold} when rescoring",
+        name=lr.experiment("E1-choose"),
+        run_name=lr.run_name("E1-choose", side, f"t={threshold} · prompt {record['prompt_version']}", path, record["git"]),
+        description=lr.description(f"Steps 3-5 on E1-{side}; gate applied at {threshold} when rescoring.", path),
         data=data, task=task, evaluators=[item_evaluator], run_evaluators=[run_evaluator], max_concurrency=8,
-        metadata={"split": side, "threshold": str(threshold), "prompt_version": record["prompt_version"],
-                  "model": record["model"], "mapping_config": json.dumps(record["mapping_config"]),
-                  "git": record["git"], "output_file": path.name},
+        metadata=lr.metadata("E1-choose", side, path, record["git"], threshold=str(threshold),
+                             prompt_version=record["prompt_version"], model=record["model"],
+                             mapping_config=record["mapping_config"]),
     )
     print(f"  {result.experiment_url}")
     get_client().flush()

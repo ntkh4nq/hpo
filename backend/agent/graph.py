@@ -3,8 +3,8 @@
     START ─┬─ messages input       → supervisor (Deep Agents) → END
            └─ pending_action input → apply_findings_action    → END
 
-One thread per case (thread_id = case_id) on the Postgres checkpointer (T116). A card edit after the suggestions
-re-ranks in code, never through the supervisor: 0 model requests (T91).
+One thread per case (thread_id = case_id) on the Redis checkpointer with a TTL, rebuilt from Postgres (T139).
+A card edit after the suggestions re-ranks in code, never through the supervisor: 0 model requests (T91).
 """
 
 from langchain_core.language_models import BaseChatModel

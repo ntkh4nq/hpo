@@ -44,7 +44,7 @@ class FakeChat:
     def __init__(self, replies):
         self.replies, self.calls, self.structured = list(replies), [], None
 
-    def __call__(self, model=None, timeout=120, thinking=False):
+    def __call__(self, model=None, timeout=120, thinking=False, name=None):
         self.thinking = thinking
         return self
 

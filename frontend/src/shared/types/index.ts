@@ -73,7 +73,7 @@ export type TurnItem =
   | { kind: 'step'; step: Step; state: StepStatus | 'waiting' }
   | { kind: 'text'; messageId: string; text: string };
 export interface ChatMessage { id: string; role: 'user' | 'assistant'; text: string; citations: Citation[]; progress: TurnItem[] }
-export type Notice = 'noFindings' | 'notAnalyzed' | 'caseExpired' | 'splitFailed' | null;
+export type Notice = 'noFindings' | 'notAnalyzed' | 'caseExpired' | 'reviewExpired' | 'splitFailed' | null;
 export interface AnalysisRequest { requestId: string; text: string }
 export interface ReviewContinueRequest { requestId: string }
 export interface ChatRequest { requestId: string; text: string }

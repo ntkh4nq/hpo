@@ -1,13 +1,14 @@
 """Case endpoints (docs/agent-impl-plan.md task 5; agent-plan §7.1, §7.4).
 
-A case exists from its first message until the doctor deletes it (T116): its row in `case_record`, its graph state
-in the Postgres checkpointer, its turns in `case_turn`. One turn at a time per case: a second request while a turn
+A case exists from its first message until the doctor deletes it (T116): its row and data in `case_record`, its turns
+in `case_turn`. Its graph checkpoint lives in Redis with a TTL and is rebuilt from Postgres when it expired (T139). One turn at a time per case: a second request while a turn
 runs gets 409. Turns stream SSE (api/stream.py); card edits and reads return JSON.
 Explanations of the suggestions (docs/evidence-impl-plan.md task 3) read the case and never write it.
 """
 
 import asyncio
 import uuid
+from collections import Counter
 from datetime import datetime
 from typing import Any, Literal
 
@@ -15,16 +16,18 @@ from fastapi import APIRouter, HTTPException, Request
 from fastapi.sse import EventSourceResponse
 from langchain_core.messages import HumanMessage
 from langfuse import get_client, propagate_attributes
+from langfuse.langchain import CallbackHandler
 from langgraph.types import Command
 from pydantic import BaseModel, field_validator
 
 from agent import explanations
 from agent.explanations import Explanations, ModelResult
 from agent.guard import citations
+from agent.rehydrate import transcript
 from agent.state import (CONFIG, FindingEdit, FindingView, ReviewDecision, check_edits, effective_findings,
                          is_doctor_message)
 from api import case_store
-from api.stream import pending_review, run_turn
+from api.stream import ensure_thread, pending_review, run_turn, save_case, trace_metadata
 from ranking.schema import Ranking
 
 router = APIRouter(tags=["cases"])
@@ -108,6 +111,7 @@ class CaseView(BaseModel):
     messages: list[MessageView] = []
     turns: list[TurnView] = []
     notes_archive: list[dict[str, Any]] = []   # notes of earlier analyses of this case (agent/analysis.py)
+    review_expired: bool = False   # the last turn paused for review, but its checkpoint expired: send the text again (T139)
 
 
 def fail(status: int, code: str, message: str):
@@ -119,11 +123,13 @@ def config(case_id: str) -> dict:
 
 
 def case_view(case_id: str, status: str, snapshot) -> CaseView:
-    """Sync (two short queries): call it from a thread in async routes."""
-    values = snapshot.values
+    """Sync (short queries): call it from a thread in async routes. The case data comes from the live checkpoint,
+    else from what Postgres kept (T139)."""
+    values = snapshot.values or case_store.get_state(case_id)
     record = case_store.get(case_id) or {}
+    turns = case_store.turns(case_id) if record else []
     messages = []
-    for m in values.get("messages", []):
+    for m in values.get("messages") or transcript(turns):
         if is_doctor_message(m):
             messages.append(MessageView(role="user", text=m.text))
         elif m.type == "ai" and m.text:
@@ -135,8 +141,19 @@ def case_view(case_id: str, status: str, snapshot) -> CaseView:
                     description=(review or {}).get("description") or values.get("description"),
                     hpo_release=values.get("hpo_release"),
                     analysis_flags=values.get("analysis_flags"), findings=findings,
-                    ranking=values.get("ranking"), messages=messages,
-                    turns=case_store.turns(case_id) if record else [], notes_archive=values.get("notes_archive") or [])
+                    ranking=values.get("ranking"), messages=messages, turns=turns,
+                    notes_archive=values.get("notes_archive") or [],
+                    review_expired=review_expired(status, turns))
+
+
+def review_expired(status: str, turns: list[dict]) -> bool:
+    """The last turn ended paused for review, yet the case is not waiting: the Redis checkpoint expired (T139)."""
+    return status == "idle" and bool(turns) and turns[-1]["outcome"] == "review"
+
+
+async def case_values(case_id: str, snapshot) -> dict:
+    """The case data: the live checkpoint, else what Postgres kept (T139)."""
+    return snapshot.values or await asyncio.to_thread(case_store.get_state, case_id)
 
 
 def status_of(case_id: str, snapshot) -> str:
@@ -197,12 +214,13 @@ async def create_case(body: TextIn, request: Request):
 
 @router.get("/cases", response_model=list[CaseSummary])
 async def list_cases(request: Request):
-    """Every kept case, last used first (no user accounts: one team, MVP)."""
-    graph = request.app.state.graph
+    """Every kept case, last used first (no user accounts: one team, MVP). Reads Postgres only, so listing does not
+    refresh the TTL of every checkpoint (T139); a review that expired shows as review until the case is opened."""
     out = []
     for row in await asyncio.to_thread(case_store.list_cases):
-        snapshot = await graph.aget_state(config(row["case_id"]))
-        out.append(CaseSummary(**row, status=status_of(row["case_id"], snapshot)))
+        outcome = row.pop("last_outcome")
+        status = "running" if row["case_id"] in RUNNING else "review" if outcome == "review" else "idle"
+        out.append(CaseSummary(**row, status=status))
     return out
 
 
@@ -215,7 +233,7 @@ async def rename_case(case_id: str, body: TitleIn, request: Request):
 
 @router.delete("/cases/{case_id}", status_code=204)
 async def delete_case(case_id: str, request: Request):
-    """Delete the case for good: graph state, turns, explanations cache (T116)."""
+    """Delete the case for good: Redis checkpoint, case data, turns, explanations cache (T116, T139)."""
     graph = request.app.state.graph
     status, _ = await load(graph, case_id)
     if status == "running":
@@ -238,6 +256,8 @@ async def post_message(case_id: str, body: TextIn, request: Request):
 async def post_review(case_id: str, body: ReviewDecision, request: Request):
     """The doctor's decision at the review step: continue (with edits and notes), remap one finding, or cancel."""
     status, snapshot = await load(request.app.state.graph, case_id)
+    if status == "idle" and review_expired(status, await asyncio.to_thread(case_store.turns, case_id)):
+        fail(409, "review_expired", "Phiên xem biểu hiện đã hết hạn; gửi lại mô tả để phân tích lại.")
     check(status, "review")
     views = [FindingView.model_validate(f) for f in pending_review(snapshot)["findings"]]
     try:
@@ -258,21 +278,30 @@ async def post_findings(case_id: str, body: FindingsIn, request: Request):
     graph = request.app.state.graph
     status, snapshot = await load(graph, case_id)
     check(status, "idle")
-    if not snapshot.values.get("ranking"):
+    values = await case_values(case_id, snapshot)
+    if not values.get("ranking"):
         fail(409, "no_ranking", "Ca chưa có gợi ý để xếp hạng lại.")
     try:
-        check_edits(effective_findings(snapshot.values), body.edits, body.notes)
+        check_edits(effective_findings(values), body.edits, body.notes)
     except ValueError as exc:
         fail(422, "invalid_request", str(exc))
     RUNNING.add(case_id)
     edits = [e.model_dump(mode="json", exclude_none=True) for e in body.edits]
     try:
-        await graph.ainvoke({"pending_action": {"type": "update_findings", "edits": edits, "notes": body.notes}},
-                            config(case_id))
+        # Same trace shape as a chat turn (api/stream.py run_turn): "turn n · findings", grouped by case.
+        name = f"turn {await asyncio.to_thread(case_store.next_turn_no, case_id)} · findings"
+        meta = await asyncio.to_thread(trace_metadata, case_id)
+        with get_client().start_as_current_observation(name=name, as_type="span",
+                                                       input={"edits": edits, "notes": body.notes}) as root, \
+                propagate_attributes(session_id=case_id, trace_name=name, tags=["findings"], metadata=meta):
+            await ensure_thread(graph, case_id)
+            await graph.ainvoke({"pending_action": {"type": "update_findings", "edits": edits, "notes": body.notes}},
+                                {**config(case_id), "callbacks": [CallbackHandler()]})
+            after = await save_case(graph, case_id)
+            changed = _suggestions(after.values.get("ranking")) != _suggestions(values.get("ranking"))
+            root.update(output={"ranking_changed": changed, "suggestions": _suggestions(after.values.get("ranking"))})
     finally:
         RUNNING.discard(case_id)
-    after = await graph.aget_state(config(case_id))
-    changed = _suggestions(after.values.get("ranking")) != _suggestions(snapshot.values.get("ranking"))
     await asyncio.to_thread(record_findings, case_id, {"edits": edits, "notes": body.notes, "ranking_changed": changed})
     return await view(case_id, "idle", after)
 
@@ -312,19 +341,28 @@ async def post_explanations(case_id: str, request: Request):
     graph = request.app.state.graph
     status, snapshot = await load(graph, case_id)
     check(status, "idle")
-    if not snapshot.values.get("ranking"):
+    values = await case_values(case_id, snapshot)
+    if not values.get("ranking"):
         fail(409, "no_ranking", "Ca chưa có gợi ý để giải thích.")
-    with get_client().start_as_current_observation(name="case:explanations", as_type="span"), \
-            propagate_attributes(session_id=case_id):
-        prepared = await asyncio.to_thread(explanations.prepare, snapshot.values)
+    meta = await asyncio.to_thread(trace_metadata, case_id)
+    with get_client().start_as_current_observation(name="explanations", as_type="span") as root, \
+            propagate_attributes(session_id=case_id, trace_name="explanations", tags=["explanations"], metadata=meta):
+        prepared = await asyncio.to_thread(explanations.prepare, values)
         if prepared.context is None:     # no passage for any pair: nothing to ask, nothing to cache
-            return explanations.assemble(prepared, ModelResult(created_at=explanations.now()))
+            return traced(root, explanations.assemble(prepared, ModelResult(created_at=explanations.now())))
         key = prepared.key
         if (hit := await asyncio.to_thread(case_store.cache_get, case_id, key)) is not None:
-            return explanations.assemble(prepared, ModelResult.model_validate(hit), cached=True)
+            return traced(root, explanations.assemble(prepared, ModelResult.model_validate(hit), cached=True))
         task = EXPLAINING.get((case_id, key))
         if task is None:
             task = EXPLAINING[(case_id, key)] = asyncio.create_task(_model_and_cache(case_id, prepared))
             task.add_done_callback(lambda _: EXPLAINING.pop((case_id, key), None))
         result = await asyncio.shield(task)   # a client that leaves cancels its wait, not the shared request
-        return explanations.assemble(prepared, result)
+        return traced(root, explanations.assemble(prepared, result))
+
+
+def traced(root, out: Explanations) -> Explanations:
+    """The explanations trace's output: per disease, how many pairs got each status (cited, no_passage, ...)."""
+    counts = {item.disease_id: dict(Counter(p.status for p in item.pairs)) for item in out.items}
+    root.update(output={"cached": out.cached, "pair_status": counts})
+    return out

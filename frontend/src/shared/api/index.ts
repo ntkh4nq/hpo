@@ -54,6 +54,8 @@ export interface CaseView {
   analysis_flags: { split_failed?: boolean; choose_failed?: boolean } | null;
   findings: FindingView[]; ranking: Ranking | null; messages: MessageView[];
   turns?: TurnView[]; notes_archive?: ArchivedNotesView[];
+  /** The last turn paused for review but the server's checkpoint expired: the text must be sent again (T139). */
+  review_expired?: boolean;
 }
 export interface Passage {
   chunk_id: number; ref: string; kind: string; display_text: string; figure_path: string | null;

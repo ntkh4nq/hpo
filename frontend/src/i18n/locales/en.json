@@ -194,6 +194,7 @@
   "evidence.gone": "This passage is no longer in the library.",
   "evidence.inactive": "This passage is no longer in active use in the library.",
   "notice.caseExpired": "This case is no longer on the server (it was deleted).",
+  "notice.reviewExpired": "The findings review expired; send the description again to re-analyse.",
   "notice.notAnalyzed": "This message was not read as findings; the answer is just below.",
   "notice.splitFailed": "The description could not be analysed (split step failed). Try analysing again.",
   "error.caseBusy": "This case is busy with another request. Try again in a moment.",

@@ -218,9 +218,9 @@ def _claims_with_pairs(out: ExplainOut, pairs) -> set[Pair]:
     return {(i.disease_id, c.hpo_id) for i in out.items for c in i.claims} & set(pairs)
 
 
-def _ask(human: str, usage: dict) -> ExplainOut | None:
+def _ask(human: str, usage: dict, name: str = "explanations") -> ExplainOut | None:
     return invoke_json(PROMPT, human, ExplainOut, thinking=False, timeout=EXPLAIN["timeout"], model=EXPLAIN["model"],
-                       usage=usage)
+                       usage=usage, name=name)
 
 
 def run_model(prepared: Prepared) -> ModelResult:
@@ -246,7 +246,7 @@ def run_model(prepared: Prepared) -> ModelResult:
                  for d, h in bad for c, reasons in rejected[(d, h)]]
         human += ["# Các ý đã đạt", json.dumps(accepted, ensure_ascii=False, indent=1), "",
                   "# Các ý bị bước kiểm bắt", json.dumps(wrong, ensure_ascii=False, indent=1), "", REPAIR_PROMPT]
-        fixed = _ask("\n".join(human), usage)
+        fixed = _ask("\n".join(human), usage, name="explanations_repair")
         if fixed is not None:   # the repair's word replaces the bad pairs' claims; other pairs in it are ignored
             again, _ = check_claims(fixed, {p: sent[p] for p in bad})
             valid.update({p: again.get(p, []) for p in bad})

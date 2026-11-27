@@ -6,9 +6,12 @@ back until the guard passes it, so a banned phrase never reaches the screen (T97
 Every turn is also written to `case_turn` as the doctor saw it (TurnRecord, T116).
 """
 
+import asyncio
+import contextlib
 import json
 import uuid
 from collections.abc import AsyncIterator, Callable
+from contextlib import ExitStack
 
 import openai
 from fastapi.sse import format_sse_event
@@ -17,6 +20,7 @@ from langfuse import get_client, propagate_attributes
 from langfuse.langchain import CallbackHandler
 
 from agent.guard import banned_match, citations
+from agent.rehydrate import transcript
 from agent.state import CONFIG, effective_findings
 from api import case_store
 
@@ -34,7 +38,7 @@ class TurnRecord:
 
     def __init__(self, case_id: str, route: str, input_: dict):
         self.case_id, self.order, self.steps, self.texts = case_id, [], {}, {}
-        self.outcome, self.citations = "error", []
+        self.outcome, self.citations, self.resets = "error", [], 0
         self.turn_no = case_store.start_turn(case_id, route, input_)
 
     def sse(self, event: str, data) -> bytes:
@@ -49,6 +53,7 @@ class TurnRecord:
             self.texts[mid] = self.texts.get(mid, "") + data["delta"]
         elif event == "answer_reset":
             self.texts[data["message_id"]] = ""
+            self.resets += 1
         elif event in ("review", "done", "error"):
             self.outcome = event
             self.citations = data.get("citations", []) if event == "done" else []
@@ -63,8 +68,43 @@ class TurnRecord:
                 out.append({"kind": "text", "message_id": key, "text": self.texts[key]})
         return out
 
+    def trace_output(self) -> dict:
+        """What the doctor saw at the end of the turn, for its Langfuse trace."""
+        return {"outcome": self.outcome, "answer": "\n\n".join(t for t in self.texts.values() if t),
+                "guard_resets": self.resets}
+
     def finish(self) -> None:
         case_store.finish_turn(self.case_id, self.turn_no, self.items(), self.outcome, self.citations)
+
+
+def trace_metadata(case_id: str) -> dict[str, str]:
+    """Trace metadata of a case (Langfuse requires string values of at most 200 characters)."""
+    case = case_store.get(case_id) or {}
+    return {"case_title": str(case.get("title") or "")[:200]}
+
+
+async def save_case(graph, case_id: str):
+    """Read the case's checkpoint and keep its data in Postgres (T139); returns the snapshot."""
+    snapshot = await graph.aget_state({"configurable": {"thread_id": case_id}})
+    if snapshot.values:
+        await asyncio.to_thread(case_store.save_state, case_id, snapshot.values)
+    return snapshot
+
+
+async def ensure_thread(graph, case_id: str) -> bool:
+    """Rebuild the case's thread from Postgres when its Redis checkpoint expired (T139); True when it did.
+    A live checkpoint is copied to Postgres instead, which also covers a turn whose client left before the end."""
+    snapshot = await save_case(graph, case_id)
+    if snapshot.values.get("messages"):
+        return False
+    state = await asyncio.to_thread(case_store.get_state, case_id)
+    messages = transcript(await asyncio.to_thread(case_store.turns, case_id))
+    if not (state or messages):
+        return False   # a new case: nothing to rebuild
+    # As the node with an edge to END: the thread is idle and the next input starts from START.
+    await graph.aupdate_state({"configurable": {"thread_id": case_id}}, {**state, "messages": messages},
+                              as_node="apply_findings_action")
+    return True
 
 
 def pending_review(snapshot) -> dict | None:
@@ -213,61 +253,75 @@ async def run_turn(graph, case_id: str, graph_input, view: Callable[[object], di
     hold, steps, checked = Holdback(CONFIG["holdback_chars"]), Steps(), []
     record = TurnRecord(case_id, route, input_)
     sse = record.sse   # every event goes through the record
+    # The turn's Langfuse trace: named by turn and route, grouped by case (session), with the doctor's input and,
+    # at the end, what the doctor saw (outcome, answer text, guard resets).
+    name = f"turn {record.turn_no} · {route}"
+    trace, root = ExitStack(), None
     try:
-        with get_client().start_as_current_observation(name="case:turn", as_type="span"), \
-                propagate_attributes(session_id=case_id):
-            if new_case:
-                yield sse("case", {"case_id": case_id})
-            async for ns, mode, data in graph.astream(graph_input, {**config, "callbacks": [CallbackHandler()]},
-                                                      stream_mode=STREAM_MODES, subgraphs=True):
-                supervisor = len(ns) == 1 and ns[0].startswith("supervisor:")
-                if mode == "messages":
-                    chunk, meta = data
-                    if supervisor and meta.get("langgraph_node") == "model" and chunk.type == "AIMessageChunk" \
-                            and chunk.text and (delta := hold.push(chunk.id, chunk.text)):
-                        yield sse("text", {"message_id": chunk.id, "delta": delta})
-                elif mode == "custom" and supervisor and data.get("type") == "check_answer":
-                    mid = data["message_id"]
-                    if data["passed"]:
-                        if rest := hold.passed(mid):
-                            yield sse("text", {"message_id": mid, "delta": rest})
-                        checked.append(hold.text.get(mid, ""))
-                    else:
-                        hold.drop(mid)
-                        yield sse("answer_reset", {"message_id": mid})
-                        if data.get("replacement"):
-                            yield sse("text", {"message_id": mid, "delta": data["replacement"]})
-                            checked.append(data["replacement"])
-                elif mode == "tasks" and (len(ns) >= 1 and ns[0].startswith("supervisor:")):
-                    for step in steps.task(ns, data):
-                        yield sse("step", step)
-                elif mode == "updates" and supervisor:
-                    for update in data.values():
-                        if not isinstance(update, dict):
-                            continue
-                        if update.get("todos") is not None:
-                            for step in steps.todos(update["todos"]):
-                                yield sse("step", step)
-                        if "findings" in update:
-                            yield sse("artifact", {"kind": "findings", "data": [
-                                v.model_dump(mode="json") for v in effective_findings(update)]})
-                        if update.get("ranking"):
-                            yield sse("artifact", {"kind": "ranking", "data": update["ranking"]})
-            snapshot = await graph.aget_state(config)
-            if (review := pending_review(snapshot)) is not None:
-                yield sse("review", {"findings": review["findings"], "carry_over": review.get("carry_over"),
-                                     "description": review.get("description")})
-            else:
-                yield sse("done", {"citations": citations(checked), "view": view(snapshot)})
+        root = trace.enter_context(get_client().start_as_current_observation(name=name, as_type="span", input=input_))
+        trace.enter_context(propagate_attributes(session_id=case_id, trace_name=name, tags=[route],
+                                                 metadata=trace_metadata(case_id)))
+        if new_case:
+            yield sse("case", {"case_id": case_id})
+        if route == "message":   # a review resumes its live checkpoint; post_review checks it is there
+            await ensure_thread(graph, case_id)   # this turn's row has no outcome yet: not in the rebuilt history
+        async for ns, mode, data in graph.astream(graph_input, {**config, "callbacks": [CallbackHandler()]},
+                                                  stream_mode=STREAM_MODES, subgraphs=True):
+            supervisor = len(ns) == 1 and ns[0].startswith("supervisor:")
+            if mode == "messages":
+                chunk, meta = data
+                # A whole AIMessage arrives when the answer was not streamed (a replayed answer, core/llm_cache.py);
+                # after streaming, LangGraph drops it as a duplicate of the chunks' message id.
+                if supervisor and meta.get("langgraph_node") == "model" and chunk.type in ("AIMessageChunk", "ai") \
+                        and chunk.text and (delta := hold.push(chunk.id, chunk.text)):
+                    yield sse("text", {"message_id": chunk.id, "delta": delta})
+            elif mode == "custom" and supervisor and data.get("type") == "check_answer":
+                mid = data["message_id"]
+                if data["passed"]:
+                    if rest := hold.passed(mid):
+                        yield sse("text", {"message_id": mid, "delta": rest})
+                    checked.append(hold.text.get(mid, ""))
+                else:
+                    hold.drop(mid)
+                    yield sse("answer_reset", {"message_id": mid})
+                    if data.get("replacement"):
+                        yield sse("text", {"message_id": mid, "delta": data["replacement"]})
+                        checked.append(data["replacement"])
+            elif mode == "tasks" and (len(ns) >= 1 and ns[0].startswith("supervisor:")):
+                for step in steps.task(ns, data):
+                    yield sse("step", step)
+            elif mode == "updates" and supervisor:
+                for update in data.values():
+                    if not isinstance(update, dict):
+                        continue
+                    if update.get("todos") is not None:
+                        for step in steps.todos(update["todos"]):
+                            yield sse("step", step)
+                    if "findings" in update:
+                        yield sse("artifact", {"kind": "findings", "data": [
+                            v.model_dump(mode="json") for v in effective_findings(update)]})
+                    if update.get("ranking"):
+                        yield sse("artifact", {"kind": "ranking", "data": update["ranking"]})
+        snapshot = await save_case(graph, case_id)
+        if (review := pending_review(snapshot)) is not None:
+            yield sse("review", {"findings": review["findings"], "carry_over": review.get("carry_over"),
+                                 "description": review.get("description")})
+        else:
+            yield sse("done", {"citations": citations(checked), "view": view(snapshot)})
     except ModelCallLimitExceededError:
         for step in steps.fail_open():
             yield sse("step", step)
         yield sse("text", {"message_id": f"limit-{uuid.uuid4()}", "delta": CONFIG["limit_answer"]})
-        yield sse("done", {"citations": citations(checked), "view": view(await graph.aget_state(config))})
+        yield sse("done", {"citations": citations(checked), "view": view(await save_case(graph, case_id))})
     except Exception as exc:  # noqa: BLE001 - any failure ends the turn with an error event
+        with contextlib.suppress(Exception):   # keep what the turn wrote before failing; Redis may be the failure
+            await save_case(graph, case_id)
         for step in steps.fail_open():
             yield sse("step", step)
         code = "model_unavailable" if isinstance(exc, openai.APIError) else "internal_error"
         yield sse("error", {"code": code, "message": str(exc) or type(exc).__name__})
     finally:
+        if root is not None:
+            root.update(output=record.trace_output())
+        trace.close()
         record.finish()   # synchronous: also runs when the client left and the generator is closed

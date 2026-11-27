@@ -41,5 +41,6 @@ def locate(text: str, source_text: str) -> tuple[int, int] | None:
 def split(text: str, model: str | None = None, thinking: bool | None = None) -> list[Item] | None:
     """Items of the description, or None when the model failed twice (description not analysed)."""
     thinking = CONFIG["thinking"] if thinking is None else thinking
-    out = invoke_json(PROMPT, preprocess(text), Split, thinking=thinking, timeout=CONFIG["timeout"], model=model)
+    out = invoke_json(PROMPT, preprocess(text), Split, thinking=thinking, timeout=CONFIG["timeout"], model=model,
+                      name="split")
     return None if out is None else out.items

@@ -24,6 +24,7 @@ from typing import get_args
 import numpy as np
 from langfuse import Evaluation, get_client
 
+from evals.common import langfuse_run as lr  # first: sends this process's traces to env 'eval'
 from evals.common.provenance import git_version
 from evals.common.tree import neighbours
 from evals.e2.check import DATASET as CASES_FILE, load_cases
@@ -247,14 +248,14 @@ def report(cases: list[dict], record: dict, path: Path, near: dict[str, set[str]
 
     pv = record["prompt_version"]
     result = get_client().run_experiment(
-        name="E2 description -> profile",
-        run_name=f"split {pv['split']} · choose {pv['mapping']} @ {record['git']}",
-        description=f"graph on the 40 E2 test cases, saved output {path.name}",
+        name=lr.experiment("E2"),
+        run_name=lr.run_name("E2", "test", f"split {pv['split']} · choose {pv['mapping']}", path, record["git"]),
+        description=lr.description("Phase 3 graph on the 40 E2 test cases.", path),
         data=data, task=task, evaluators=[item_evaluator], run_evaluators=[run_evaluator], max_concurrency=8,
-        metadata={"split": "test", "prompt_version_split": pv["split"], "prompt_version_mapping": pv["mapping"],
-                  "model_split": record["model"]["split"], "model_choose": record["model"]["choose"],
-                  "config": json.dumps(record["config"]), "git": record["git"],
-                  "dataset_sha256": record["dataset_sha256"], "output_file": path.name},
+        metadata=lr.metadata("E2", "test", path, record["git"], prompt_version_split=pv["split"],
+                             prompt_version_mapping=pv["mapping"], model_split=record["model"]["split"],
+                             model_choose=record["model"]["choose"], config=record["config"],
+                             dataset_sha256=record["dataset_sha256"]),
     )
     print(f"\n  {result.experiment_url}")
     get_client().flush()

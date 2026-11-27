@@ -23,6 +23,7 @@ import numpy as np
 from langfuse import Evaluation, get_client
 from pydantic import BaseModel
 
+from evals.common import langfuse_run as lr  # first: sends this process's traces to env 'eval'
 from agent.explanations import EXPLAIN, PROMPT_VERSION, ModelResult, assemble, now, pair_key, prepare, run_model
 from agent.state import finding_rows
 from agent.tools import case_ranking
@@ -96,7 +97,7 @@ def _faith_batch(case: dict, batch: list[dict]) -> dict[str, bool]:
         parts.append(f"[{i + 1}] Disease: {info['disease_name']}\nPhenotype: {info['hpo_label']}\n"
                      f"Sentence: {c['text']}\nCited passages:\n{passages}")
     out = invoke_json(FAITH_PROMPT, "\n\n".join(parts), FaithOut, thinking=False, timeout=e5.CONFIG["judge_timeout"],
-                      model=e5.CONFIG["judge_model"])
+                      model=e5.CONFIG["judge_model"], name="judge_e4_faithfulness")
     if out is None:
         return {}
     by_index = {j.index: j.supported for j in out.judgements}
@@ -201,11 +202,13 @@ def log_langfuse(record: dict, summary: dict, path: Path) -> None:
                       Evaluation(name="input_tokens_mean", value=summary["input_tokens_mean"])]
 
     get_client().run_experiment(
-        name="E4 explanations", run_name=f"e4-{record['split']}-{record['created_at'].replace(':', '')}",
-        description=f"saved output {path.name}", data=items, task=task, evaluators=[item_evaluator],
+        name=lr.experiment("E4"),
+        run_name=lr.run_name("E4", record["split"], f"prompt {record['prompt_version']}", path, record["git"]),
+        description=lr.description("Explanations of the top 10 for each case, judged for faithfulness.", path),
+        data=items, task=task, evaluators=[item_evaluator],
         run_evaluators=[run_evaluator], max_concurrency=16,
-        metadata={"split": record["split"], "git": record["git"], "prompt_version": record["prompt_version"],
-                  "judges": record["judge_versions"], "output_file": path.name})
+        metadata=lr.metadata("E4", record["split"], path, record["git"], prompt_version=record["prompt_version"],
+                             judges=record["judge_versions"]))
     get_client().flush()
 
 

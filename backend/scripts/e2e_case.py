@@ -1,7 +1,7 @@
 """Real end-to-end run of one case through the running API (docs/agent-impl-plan.md task 6; plan.md phase 5;
 explanations and the literature turn: docs/evidence-impl-plan.md task 4).
 
-    make up && make api        # in another terminal
+    make api                   # in another terminal (Postgres and Redis on Railway, .env)
     make e2e                   # about 20–25 DeepSeek requests + free Qwen; API_BASE_URL defaults to localhost:8000
 
 Prints every progress step, the streamed text, the time of each turn and the citations; exits 1 if a check fails.
@@ -159,14 +159,23 @@ def main() -> None:
         skipped = [s.get("finding_id") for s in (view.get("ranking") or {}).get("skipped", [])]
         check(resp.status_code == 200 and dropped in skipped, f"4: {dropped} nằm trong ranking.skipped")
         e4 = explanations(client, case_id, "4 · giải thích sau khi sửa", len(view.get("ranking", {}).get("suggestions", [])))
-        check(bool(e4) and e4.get("explanation_key") != e1.get("explanation_key"), "4: khoá giải thích đổi")
+        ids = lambda ranking: [s["disease_id"] for s in (ranking or {}).get("suggestions", [])]
+        before, after = ids(t1c[-1][1]["view"]["ranking"]) if last(t1c) == "done" else [], ids(view.get("ranking"))
+        check([i["disease_id"] for i in e4.get("items", [])] == after, "4: giải thích theo danh sách sau khi sửa")
+        if after != before:   # the model input changed: a new key; an unchanged list may reuse the cache (T136 (3))
+            check(bool(e4) and e4.get("explanation_key") != e1.get("explanation_key"), "4: danh sách đổi, khoá giải thích đổi")
+        else:
+            print("  (danh sách gợi ý không đổi: giải thích dùng lại cache là đúng)")
 
         t5a = turn(client, "5 · câu hỏi kèm mô tả", f"/cases/{case_id}/messages",
-                   {"text": "Thai 22 tuần có thông liên thất, đa ối. Có phải CHARGE không?"})
+                   {"text": "Thai có thêm đa ối. Có phải CHARGE không?"})
         check(last(t5a) == "review", "5: dừng ở bước xem biểu hiện")
         t5b = turn(client, "5 · Tiếp tục", f"/cases/{case_id}/review", {"action": "continue"})
         used = tools(t5a, t5b)
-        check(len(t5a[-1][1]["findings"]) > len(findings) if last(t5a) == "review" else False,
+        # No gestational age in the follow-up: a different age reads as another exam and the split keeps only the
+        # current one (prompts/split.md), which would drop the new finding.
+        found = t5a[-1][1]["findings"] if last(t5a) == "review" else []
+        check(any("đa ối" in f["phrase"] for f in found) and len(found) > len(findings),
               "5: tin nhắn được thêm vào mô tả, giữ biểu hiện cũ (T137)")
         check("analyze_findings" in used and any(n == "artifact" and d["kind"] == "ranking" for n, d in t5b),
               "5: analyze_findings, có ranking")

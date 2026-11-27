@@ -4,6 +4,15 @@
 # Team assumption: one line of the case list in the sidebar.
 case_title_chars = 60
 
+# The case checkpoint lives in Redis this long after its last turn or read, then Redis deletes it; the case data
+# stays in Postgres (case_record.state, case_turn) and the thread is rebuilt from it on the next turn (T139).
+case_ttl_minutes = 1440
+case_ttl_refresh_on_read = true
+# Redis is reached through Railway's public TCP proxy, which can drop idle connections: ping a pooled connection
+# idle this long before reusing it, and retry a command this many times on a connection error or timeout (T139).
+redis_health_check_seconds = 30
+redis_retries = 3
+
 # Max characters of a doctor message, a remap phrase, or a note. Team assumption: the longest
 # E2 description is 690 characters (evals/e2/dataset.jsonl); 4000 leaves room for long reports.
 text_max_chars = 4000

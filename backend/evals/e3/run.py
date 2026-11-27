@@ -23,6 +23,7 @@ from pathlib import Path
 import numpy as np
 from langfuse import Evaluation, get_client
 
+from evals.common import langfuse_run as lr  # first: sends this process's traces to env 'eval'
 from evals.common.provenance import git_version
 from evals.common.stats import bootstrap_ci, bootstrap_ratio_ci, paired_bootstrap_ratio_diff
 from evals.e3.dataset import DATASET as LANGFUSE_DATASET
@@ -184,12 +185,12 @@ def log_langfuse(record: dict, scored: dict, path: Path, methods: tuple[str, ...
             return out
 
         result = get_client().run_experiment(
-            name="E3 simulated patients", run_name=f"{record['split']} · {m} @ {record['git']}",
-            description=f"saved output {path.name}", data=data, task=task, evaluators=[item_evaluator],
+            name=lr.experiment("E3"), run_name=lr.run_name("E3", record["split"], m, path, record["git"]),
+            description=lr.description(f"Ranking method {m}.", path), data=data, task=task, evaluators=[item_evaluator],
             run_evaluators=[run_evaluator], max_concurrency=16,
-            metadata={"split": record["split"], "method": m, "git": record["git"],
-                      "ranking_config": record["ranking_config"], "hpo_release": record["hpo_release"],
-                      "dataset_sha256": record["dataset_sha256"], "output_file": path.name},
+            metadata=lr.metadata("E3", record["split"], path, record["git"], method=m,
+                                 ranking_config=record["ranking_config"], hpo_release=record["hpo_release"],
+                                 dataset_sha256=record["dataset_sha256"]),
         )
         print(f"  {m}: {result.experiment_url}", flush=True)
     get_client().flush()

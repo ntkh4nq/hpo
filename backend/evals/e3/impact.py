@@ -16,6 +16,7 @@ from pathlib import Path
 import numpy as np
 from langfuse import Evaluation, get_client
 
+from evals.common import langfuse_run as lr  # first: sends this process's traces to env 'eval'
 from evals.common.provenance import git_version
 from evals.common.stats import bootstrap_ci, paired_bootstrap_diff
 from evals.e2.check import DATASET as E2_CASES_FILE, load_cases
@@ -124,11 +125,13 @@ def log_langfuse(record: dict, scored: dict, path: Path) -> None:
         return out
 
     result = get_client().run_experiment(
-        name="E2 -> E3 impact", run_name=f"{record['method']} @ {record['git']}",
-        description=f"ranking with gold vs machine profile; saved output {path.name}", data=data, task=task,
+        name=lr.experiment("E2-E3"), run_name=lr.run_name("E2-E3", "test", record["method"], path, record["git"]),
+        description=lr.description("Ranking with the gold profile vs the machine profile of each E2 case.", path),
+        data=data, task=task,
         evaluators=[item_evaluator], run_evaluators=[run_evaluator], max_concurrency=8,
-        metadata={"method": record["method"], "git": record["git"], "ranking_config": record["ranking_config"],
-                  "hpo_release": record["hpo_release"], "e2_output": record["e2_output"]},
+        metadata=lr.metadata("E2-E3", "test", path, record["git"], method=record["method"],
+                             ranking_config=record["ranking_config"], hpo_release=record["hpo_release"],
+                             e2_output=record["e2_output"]),
     )
     print(f"\n  {result.experiment_url}")
     get_client().flush()

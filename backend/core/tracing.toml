@@ -1,0 +1,5 @@
+# Langfuse span filter (core/tracing.py). A span whose name fully matches one of these patterns is not exported.
+# LangChain reports every agent middleware hook (before/after a model call or the whole agent) as a span of its own,
+# e.g. "AnswerGuardMiddleware.after_model": four per model call, no input or output worth reading, and they bury the
+# model and tool spans of a turn. Guard rewrites stay visible in the turn's output (guard_resets).
+hidden_span_patterns = ['.*Middleware\.(before|after)_(model|agent)']
